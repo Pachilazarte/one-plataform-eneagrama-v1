@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ONE Eneagrama</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'one-cyan': '#6be1e3',
+                        'one-pink': '#e17bd7',
+                        'one-gold': '#e4c76a',
+                        'one-slate': '#a4a8c0',
+                        'one-mist': '#c6c9d7',
+                        'one-ink': '#1a181d',
+                    },
+                    fontFamily: {
+                        'exo': ['"Exo 2"', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="./style.css">
+    <script src="../Marca.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/helpers.js"></script>
+</head>
+<body class="font-exo bg-black text-white min-h-screen overflow-x-hidden">
+
+
+    
+    <!-- Background Effects -->
+    <div class="fixed inset-0 -z-20 bg-gradient-to-br from-black via-one-ink to-black"></div>
+    <div class="fixed inset-0 -z-10 bg-pattern opacity-95 blur-[18px]"></div>
+    <div class="fixed inset-[-20%] -z-10 hex-pattern opacity-16 mix-blend-screen transform rotate-[-8deg]"></div>
+
+<!-- Header -->
+<header class="dashboard-header sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/10">
+    <div class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <div class="flex items-center gap-4">
+                <img src="../img/one-logocolor.png" alt="Logo" class="header-logo w-16 h-18 object-contain">
+                <div>
+                    <h2 class="font-exo text-xl font-bold bg-gradient-to-r from-one-cyan to-one-pink bg-clip-text text-transparent">
+                        Panel del Administrador
+                    </h2>
+                    <p class="user-info text-xs text-one-slate" id="userInfo"></p>
+                </div>
+            </div>
+
+
+
+                
+<button class="btn btn-danger px-5 py-2 rounded-full bg-red-500/20 border border-red-500/40 hover:border-red-500/60 transition-all hover:-translate-y-0.5 text-sm font-semibold flex items-center gap-2" 
+        onclick="Auth.logout()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+    Cerrar Sesión
+</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        
+        <div id="alertContainer" class="mb-6"></div>
+        <div id="loadingContainer" class="hidden"></div>
+
+<div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="stat-card relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600/10 to-blue-700/10 border border-blue-500/20 p-6 backdrop-blur-sm">
+        <div class="relative flex items-center gap-4">
+            <div class="stat-icon w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+            </div>
+            <div>
+                <h3 id="totalUsers" class="text-3xl font-black text-blue-400">0</h3>
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Usuarios Totales</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600/10 to-green-700/10 border border-green-500/20 p-6 backdrop-blur-sm">
+        <div class="relative flex items-center gap-4">
+            <div class="stat-icon w-14 h-14 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                </svg>
+            </div>
+            <div>
+                <h3 id="activeUsers" class="text-3xl font-black text-green-400">0</h3>
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Activos</p>
+            </div>
+        </div>
+    </div>
+            <!-- Pending Tests -->
+            <div class="stat-card relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-600/10 border border-orange-500/20 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-radial from-orange-500/5 to-transparent opacity-50"></div>
+                <div class="relative flex items-center gap-4">
+                    <div class="stat-icon w-14 h-14 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingUsers" class="text-3xl font-black text-orange-400">0</h3>
+                        <p class="text-xs text-gray-400 mt-1">Pendientes Test</p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            
+            <!-- Completed Tests -->
+            <div class="stat-card relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-radial from-blue-500/5 to-transparent opacity-50"></div>
+                <div class="relative flex items-center gap-4">
+                    <div class="stat-icon w-14 h-14 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedTests" class="text-3xl font-black text-blue-400">0</h3>
+                        <p class="text-xs text-gray-400 mt-1">Tests Completados</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <!-- ── ACCESO DASHBOARD ORGANIZACIONAL ── -->
+<div class="mb-8">
+    <a href="./paneldata/index.html"
+       class="flex items-center gap-4 w-full rounded-2xl border border-one-cyan/30 
+              bg-gradient-to-r from-one-cyan/10 to-one-pink/10 
+              hover:from-one-cyan/20 hover:to-one-pink/20
+              backdrop-blur-sm px-6 py-5 transition-all duration-300 
+              hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(107,225,227,0.15)]
+              group cursor-pointer">
+        
+        <!-- Icono -->
+        <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-one-cyan/20 to-one-pink/20 
+                    border border-one-cyan/20 flex items-center justify-center flex-shrink-0
+                    group-hover:scale-105 transition-transform duration-300">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6be1e3" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <path d="M14 17h7M17 14v7"/>
+            </svg>
+        </div>
+
+        <!-- Texto -->
+        <div class="flex-1">
+            <div class="text-base font-bold text-white mb-1">
+                Dashboard Organizacional
+            </div>
+            <div class="text-xs text-one-slate">
+                Análisis de eneatipos del equipo · Compatibilidad · Potenciales líderes · Insights organizacionales
+            </div>
+        </div>
+
+        <!-- Flecha -->
+        <div class="text-one-cyan opacity-60 group-hover:opacity-100 group-hover:translate-x-1 
+                    transition-all duration-300 flex-shrink-0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </div>
+    </a>
+</div>
+
+<div class="card mb-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-xl overflow-hidden">
+            <div class="card-header px-6 py-4 border-b border-white/10 bg-gradient-to-r from-one-cyan/10 to-one-pink/10">
+                <h3 class="card-title font-exo text-lg font-bold">Habilitar Nuevo Usuario</h3>
+            </div>
+            
+            <form id="newUserForm" class="p-6">
+                <div class="form-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300" for="userUsuario">Usuario</label>
+                        <input type="text" id="userUsuario" class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white placeholder-gray-500" placeholder="Ej: usuario01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300" for="userPassword">Contraseña (Mínimo 8 caracteres)</label>
+                        <div class="relative">
+                            <input type="password" id="userPassword" class="form-input w-full px-4 py-2.5 pr-12 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white placeholder-gray-500" placeholder="Contraseña" required>
+                            <button type="button" onclick="toggleInputPassword('userPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-one-cyan transition-colors">
+                                <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="eye-closed hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300" for="userEmail">Email</label>
+                        <input type="email" id="userEmail" class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white placeholder-gray-500" placeholder="usuario@ejemplo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300" for="userNombre">Nombre Completo</label>
+                        <input type="text" id="userNombre" class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white placeholder-gray-500" placeholder="Juan Pérez" required>
+                    </div>
+                </div>
+
+<div id="packLiderContainer" class="hidden mb-6 p-4 rounded-2xl border border-one-gold/20 bg-one-gold/5 flex items-center justify-between group transition-all hover:border-one-gold/40">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-one-gold/10 flex items-center justify-center text-one-gold">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-8.061 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946 8.061 3.42 3.42 0 010 4.438 3.42 3.42 0 00-1.946 8.061 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-8.061 3.42 3.42 0 010-4.438z" />
+            </svg>
+        </div>
+        <div>
+            <span class="block text-sm font-bold text-white uppercase tracking-wider font-exo">Habilitar Lider Pack</span>
+            <span class="text-[11px] text-gray-400">Permite asignar el Paquete de Líder (Manual Personalizado).</span>
+        </div>
+    </div>
+    <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="chkPackLider" class="sr-only peer">
+        <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-one-gold shadow-[0_0_15px_rgba(228,199,106,0.1)]"></div>
+    </label>
+</div>
+
+                <button type="submit" id="btnCrearUsuario" class="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full bg-gradient-to-r from-one-cyan/20 to-one-pink/20 border border-one-cyan/40 hover:border-one-cyan/60 transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(107,225,227,0.4)] font-bold relative overflow-hidden group disabled:opacity-40 disabled:cursor-not-allowed">
+                    <div class="absolute inset-0 bg-gradient-to-r from-one-cyan/30 to-one-pink/30 blur-xl opacity-50 group-hover:opacity-80 transition-opacity -z-10"></div>
+                    <span id="btnCrearTexto" class="flex items-center justify-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Crear Usuario
+                    </span>
+                    <span id="btnCrearLoading" class="hidden flex items-center justify-center gap-2">
+                        <svg class="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round"/>
+                        </svg>
+                        Creando...
+                    </span>
+                </button>
+            </form>
+        </div>
+        
+
+
+
+<!-- Tabla de Usuarios -->
+<div class="card rounded-2xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 backdrop-blur-xl overflow-hidden">
+    <div class="card-header px-5 py-3.5 border-b border-white/10 bg-gradient-to-r from-one-cyan/10 to-one-pink/10">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h3 class="card-title font-exo text-base font-bold">Mis Usuarios</h3>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-56">
+                    <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text"
+                           id="searchInput"
+                           class="w-full pl-8 pr-3 py-1.5 rounded-lg bg-black/40 border border-white/15 focus:border-one-cyan/50 focus:outline-none focus:ring-1 focus:ring-one-cyan/20 transition-all text-xs text-white placeholder-gray-500"
+                           placeholder="Buscar usuario o email..."
+                           oninput="filterUsers()">
+                </div>
+                <button class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-white/20 bg-white/5 hover:bg-white/10 transition-all text-xs font-semibold flex items-center gap-1.5 text-gray-300 hover:text-white"
+                        onclick="loadUsers()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                    </svg>
+                    Actualizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table w-full border-collapse table-fixed">
+            <thead class="bg-gradient-to-r from-one-ink via-one-pink/20 to-one-ink">
+                <tr>
+                    <th class="w-[15%] px-3 py-3 text-left   text-[9px] font-bold uppercase tracking-wider text-gray-300">Usuario</th>
+                    <th class="w-[20%] px-3 py-3 text-left   text-[9px] font-bold uppercase tracking-wider text-gray-300">Email</th>
+                    <th class="w-[11%] px-3 py-3 text-left   text-[9px] font-bold uppercase tracking-wider text-gray-300">Contraseña</th>
+                    <th class="w-[14%] px-3 py-3 text-left   text-[9px] font-bold uppercase tracking-wider text-gray-300">Nombre</th>
+                    <th class="w-[14%] px-3 py-3 text-center text-[9px] font-bold uppercase tracking-wider text-gray-300">Pack Líder</th>
+                    <th class="w-[9%]  px-3 py-3 text-center text-[9px] font-bold uppercase tracking-wider text-gray-300">Estado</th>
+                    <th class="w-[9%]  px-3 py-3 text-center text-[9px] font-bold uppercase tracking-wider text-gray-300">Test</th>
+                    <th class="w-[8%]  px-3 py-3 text-center text-[9px] font-bold uppercase tracking-wider text-gray-300">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-white/5">
+                <tr>
+                    <td colspan="8" class="px-6 py-8 text-center text-gray-400">Cargando datos...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+    <!-- Modal de Editar Usuario -->
+    <div id="editModal" class="modal-overlay hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="modal-content relative w-full max-w-lg rounded-2xl bg-gradient-to-br from-one-ink to-black border border-white/15 backdrop-blur-xl shadow-2xl overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-one-cyan/10 to-one-pink/10 flex items-center justify-between">
+                <h3 class="font-exo text-lg font-bold">Editar Usuario</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="editUserForm" class="p-6">
+                <input type="hidden" id="editOriginalUsuario">
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300">Usuario <span class="text-gray-500 text-xs">(identificador único, no editable)</span></label>
+                        <input type="text" id="editUsuario" readonly
+                               class="form-input w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/5 text-gray-400 cursor-not-allowed transition-all" tabindex="-1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300">Email</label>
+                        <input type="email" id="editEmail" 
+                               class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300">Nombre Completo</label>
+                        <input type="text" id="editNombre" 
+                               class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label block text-sm font-semibold mb-2 text-gray-300">Nueva Contraseña <span class="text-gray-500 text-xs">(dejar vacío para no cambiar)</span></label>
+                        <div class="relative">
+                            <input type="password" id="editPassword" 
+                                   class="form-input w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none focus:ring-2 focus:ring-one-cyan/20 transition-all text-white pr-12" 
+                                   placeholder="••••••••">
+                            <button type="button" onclick="toggleInputPassword('editPassword', this)" 
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-one-cyan transition-colors">
+                                <svg class="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg class="eye-closed hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeEditModal()" 
+                            class="flex-1 px-6 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 transition-all text-sm font-semibold">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-6 py-2.5 rounded-full bg-gradient-to-r from-one-cyan/20 to-one-pink/20 border border-one-cyan/40 hover:border-one-cyan/60 transition-all font-bold text-sm">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación Genérico -->
+    <div id="confirmModal" class="modal-overlay hidden fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeConfirmModal()"></div>
+        <div class="modal-content relative w-full max-w-md rounded-2xl bg-gradient-to-br from-one-ink to-black border border-white/15 backdrop-blur-xl shadow-2xl overflow-hidden transform transition-all">
+            <div class="p-6 text-center">
+                <div id="confirmIcon" class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"></div>
+                <h3 id="confirmTitle" class="font-exo text-xl font-bold mb-2"></h3>
+                <p id="confirmMessage" class="text-gray-400 text-sm mb-6"></p>
+                <div class="flex gap-3">
+                    <button onclick="closeConfirmModal()" 
+                            class="flex-1 px-6 py-2.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 transition-all text-sm font-semibold">
+                        Cancelar
+                    </button>
+                    <button id="confirmBtn" 
+                            class="flex-1 px-6 py-2.5 rounded-full transition-all font-bold text-sm cursor-pointer">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-6 right-6 z-[120] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script src="./script.js"></script>
+
+    <style>
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</body>
+</html>

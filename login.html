@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eneagrama - ONE Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../img/favicon.png" sizes="32x32">
+    
+    <!-- Fonts: Exo 2 (ONE) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Scripts originales -->
+    <script src="../Marca.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'one': {
+                            black: '#000000',
+                            ink: '#1a181d',
+                            pink: '#e17bd7',
+                            cyan: '#6be1e3',
+                            gold: '#e4c76a',
+                            slate: '#a4a8c0',
+                            mist: '#c6c9d7'
+                        }
+                    },
+                    fontFamily: {
+                        'one': ['Exo 2', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Background gradientes ONE */
+        body {
+            font-family: 'Exo 2', system-ui, sans-serif;
+            background: 
+                radial-gradient(1200px 700px at 70% 25%, rgba(225,123,215,.18), transparent 55%),
+                radial-gradient(1100px 700px at 80% 60%, rgba(107,225,227,.14), transparent 55%),
+                radial-gradient(900px 600px at 20% 70%, rgba(228,199,106,.10), transparent 60%),
+                linear-gradient(180deg, #000000, #1a181d);
+        }
+        
+        /* Patrón hexagonal animado */
+        .hex-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='150' viewBox='0 0 260 150'%3E%3Cg fill='none' stroke='%23c6c9d7' stroke-opacity='0.35' stroke-width='1'%3E%3Cpath d='M50 20l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M120 20l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M190 20l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M85 55l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M155 55l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M50 90l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M120 90l20-12 20 12v24l-20 12-20-12z'/%3E%3Cpath d='M190 90l20-12 20 12v24l-20 12-20-12z'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 260px 150px;
+            background-repeat: repeat;
+        }
+        
+        /* Logo pulse */
+        @keyframes logoPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 1px rgba(198, 201, 215, .18), 0 0 60px rgba(107, 225, 227, .25);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(198, 201, 215, .25), 0 0 80px rgba(225, 123, 215, .35);
+                transform: scale(1.05);
+            }
+        }
+        
+        .logo-pulse {
+            animation: logoPulse 4s ease-in-out infinite;
+        }
+        
+        /* Card hover glow effects */
+        .card-superadmin:hover {
+            box-shadow: 0 0 0 1px rgba(225, 123, 215, .35), 0 20px 60px rgba(0, 0, 0, .6), 0 0 80px rgba(225, 123, 215, .3) !important;
+        }
+        
+        .card-admin:hover {
+            box-shadow: 0 0 0 1px rgba(107, 225, 227, .35), 0 20px 60px rgba(0, 0, 0, .6), 0 0 80px rgba(107, 225, 227, .3) !important;
+        }
+        
+        .card-user:hover {
+            box-shadow: 0 0 0 1px rgba(228, 199, 106, .35), 0 20px 60px rgba(0, 0, 0, .6), 0 0 80px rgba(228, 199, 106, .3) !important;
+        }
+        
+        /* Icon rotation on hover */
+        .card-icon-wrapper:hover .card-icon {
+            transform: rotateY(360deg);
+        }
+        
+        .card-icon {
+            transition: transform 0.8s ease;
+        }
+        
+        /* Gradient text animation */
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, #6be1e3, #e17bd7, #e4c76a, #6be1e3);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+        }
+        
+        /* Partículas flotantes */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) translateX(15px) rotate(120deg); }
+            66% { transform: translateY(15px) translateX(-15px) rotate(240deg); }
+        }
+        
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        
+        .particle-1 { top: 15%; left: 10%; background: #6be1e3; animation-delay: 0s; }
+        .particle-2 { top: 25%; right: 15%; background: #e17bd7; animation-delay: 2s; }
+        .particle-3 { bottom: 30%; left: 20%; background: #e4c76a; animation-delay: 4s; }
+        .particle-4 { top: 45%; right: 25%; background: #6be1e3; animation-delay: 1s; }
+        .particle-5 { bottom: 15%; right: 35%; background: #e17bd7; animation-delay: 3s; }
+        .particle-6 { top: 60%; left: 30%; background: #e4c76a; animation-delay: 5s; }
+        
+        /* Rings decoration */
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .decorative-ring {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: rotateRing 20s linear infinite;
+        }
+        
+        .ring-1 {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            right: -100px;
+            border-color: #6be1e3;
+            animation-direction: normal;
+        }
+        
+        .ring-2 {
+            width: 500px;
+            height: 500px;
+            bottom: -150px;
+            left: -150px;
+            border-color: #e17bd7;
+            animation-direction: reverse;
+            animation-duration: 30s;
+        }
+        
+        /* Button glow effect */
+        .btn-glow::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: 999px;
+            opacity: 0;
+            filter: blur(12px);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-glow:hover::before {
+            opacity: 0.8;
+        }
+        
+        .btn-superadmin::before {
+            background: radial-gradient(circle, rgba(225, 123, 215, .6), transparent 70%);
+        }
+        
+        .btn-admin::before {
+            background: radial-gradient(circle, rgba(107, 225, 227, .6), transparent 70%);
+        }
+        
+        .btn-user::before {
+            background: radial-gradient(circle, rgba(228, 199, 106, .6), transparent 70%);
+        }
+        
+        /* Scroll bar ONE style */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { 
+            background: linear-gradient(180deg, #6be1e3, #e17bd7);
+            border-radius: 6px;
+            border: 2px solid #000000;
+        }
+        
+        /* Entrance animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; opacity: 0; }
+        .delay-200 { animation-delay: 0.2s; opacity: 0; }
+        .delay-300 { animation-delay: 0.3s; opacity: 0; }
+        .delay-400 { animation-delay: 0.4s; opacity: 0; }
+        .delay-500 { animation-delay: 0.5s; opacity: 0; }
+    </style>
+</head>
+
+<body class="min-h-screen text-white overflow-x-hidden relative">
+    
+    <!-- Background Effects Layer -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <!-- Hex pattern -->
+        <div class="absolute inset-[-20%] opacity-[0.15] hex-pattern transform -rotate-8 mix-blend-screen"></div>
+        
+        <!-- Animated haze layers -->
+        <div class="absolute inset-[-10%] opacity-90 blur-lg">
+            <div class="absolute inset-0" style="background: radial-gradient(circle at 25% 20%, rgba(107,225,227,.12), transparent 40%)"></div>
+            <div class="absolute inset-0" style="background: radial-gradient(circle at 80% 35%, rgba(225,123,215,.12), transparent 38%)"></div>
+            <div class="absolute inset-0" style="background: radial-gradient(circle at 55% 85%, rgba(228,199,106,.10), transparent 45%)"></div>
+        </div>
+        
+        <!-- Decorative rings -->
+        <div class="decorative-ring ring-1"></div>
+        <div class="decorative-ring ring-2"></div>
+        
+        <!-- Floating particles -->
+        <div class="particle particle-1"></div>
+        <div class="particle particle-2"></div>
+        <div class="particle particle-3"></div>
+        <div class="particle particle-4"></div>
+        <div class="particle particle-5"></div>
+        <div class="particle particle-6"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-5 sm:p-8">
+        
+        <div class="w-full max-w-7xl">
+            
+            <!-- Header -->
+            <header class="text-center mb-16 animate-fade-in-up">
+                
+                <!-- Logo -->
+                <div class="logo-pulse w-28 h-28 sm:w-36 sm:h-36 mx-auto mb-8 rounded-full flex items-center justify-center relative overflow-hidden"
+                     style="background: linear-gradient(135deg, rgba(254, 254, 255, .08), rgba(254, 254, 255, .12)); backdrop-filter: blur(20px); border: 1px solid rgba(198, 201, 215, .25);">
+                    <img src="../img/imagen1.svg" alt="Logo Eneagrama" class="w-full h-full object-contain p-6">
+                    <!-- Brillo superior -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+                </div>
+                
+                <!-- Title -->
+                <h1 class="font-one text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 tracking-tight animate-fade-in-up delay-100">
+                    Sistema de Evaluación <span class="gradient-text">Eneagrama</span>
+                </h1>
+                
+                <!-- Subtitle -->
+                <p class="text-lg sm:text-xl md:text-2xl text-one-mist/80 font-medium animate-fade-in-up delay-200">
+                    Selecciona tu perfil para ingresar
+                </p>
+                
+                <!-- Badge decorativo -->
+                <div class="inline-flex items-center gap-2 mt-6 px-5 py-2.5 rounded-full animate-fade-in-up delay-300"
+                     style="background: rgba(254, 254, 255, 0.06); backdrop-filter: blur(12px); border: 1px solid rgba(198, 201, 215, 0.18);">
+                    <span class="w-2 h-2 bg-one-cyan rounded-full animate-pulse"></span>
+                    <span class="text-xs font-bold tracking-widest uppercase text-one-mist/70">
+                        Plataforma ONE
+                    </span>
+                </div>
+                
+            </header>
+
+            <!-- Cards Container -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
+                
+                <!-- SuperAdmin Card -->
+                <div class="card-superadmin group relative rounded-2xl p-8 transition-all duration-500 hover:-translate-y-3 animate-fade-in-up delay-300"
+                     style="background: linear-gradient(135deg, rgba(254, 254, 255, .08), rgba(254, 254, 255, .05)); backdrop-filter: blur(20px); border: 1px solid rgba(198, 201, 215, .25); box-shadow: 0 10px 40px rgba(0, 0, 0, .4);"
+                     data-role="superadmin">
+                    
+                    <!-- Top gradient line -->
+                    <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-one-pink via-one-pink to-transparent"></div>
+                    
+                    <!-- Icon -->
+                    <div class="card-icon-wrapper mb-6">
+                        <div class="card-icon w-20 h-20 mx-auto rounded-2xl flex items-center justify-center"
+                             style="background: linear-gradient(135deg, rgba(225, 123, 215, .2), rgba(225, 123, 215, .1)); border: 1px solid rgba(225, 123, 215, .3); box-shadow: 0 0 30px rgba(225, 123, 215, .2);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e17bd7" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <h2 class="font-one text-2xl font-bold text-white mb-3 text-center">
+                        Super Administrador
+                    </h2>
+                    <p class="text-one-mist/70 text-sm text-center mb-6 leading-relaxed">
+                        Gestión completa del sistema y administradores
+                    </p>
+                    
+                    <!-- Button -->
+                    <button onclick="goToLogin('superadmin')" 
+                            class="btn-glow btn-superadmin relative w-full py-3.5 px-6 rounded-full font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                            style="background: rgba(225, 123, 215, .15); border: 1px solid rgba(225, 123, 215, .35); box-shadow: 0 8px 25px rgba(0, 0, 0, .3);">
+                        <span class="relative z-10">Acceder</span>
+                    </button>
+                    
+                    <!-- Glow effect interno -->
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                         style="background: radial-gradient(circle at 50% 0%, rgba(225, 123, 215, .4), transparent 60%);"></div>
+                </div>
+
+                <!-- Admin Card -->
+                <div class="card-admin group relative rounded-2xl p-8 transition-all duration-500 hover:-translate-y-3 animate-fade-in-up delay-400"
+                     style="background: linear-gradient(135deg, rgba(254, 254, 255, .08), rgba(254, 254, 255, .05)); backdrop-filter: blur(20px); border: 1px solid rgba(198, 201, 215, .25); box-shadow: 0 10px 40px rgba(0, 0, 0, .4);"
+                     data-role="admin">
+                    
+                    <!-- Top gradient line -->
+                    <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-one-cyan via-one-cyan to-transparent"></div>
+                    
+                    <!-- Icon -->
+                    <div class="card-icon-wrapper mb-6">
+                        <div class="card-icon w-20 h-20 mx-auto rounded-2xl flex items-center justify-center"
+                             style="background: linear-gradient(135deg, rgba(107, 225, 227, .2), rgba(107, 225, 227, .1)); border: 1px solid rgba(107, 225, 227, .3); box-shadow: 0 0 30px rgba(107, 225, 227, .2);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6be1e3" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <h2 class="font-one text-2xl font-bold text-white mb-3 text-center">
+                        Administrador
+                    </h2>
+                    <p class="text-one-mist/70 text-sm text-center mb-6 leading-relaxed">
+                        Gestión de usuarios y visualización de resultados
+                    </p>
+                    
+                    <!-- Button -->
+                    <button onclick="goToLogin('admin')" 
+                            class="btn-glow btn-admin relative w-full py-3.5 px-6 rounded-full font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                            style="background: rgba(107, 225, 227, .15); border: 1px solid rgba(107, 225, 227, .35); box-shadow: 0 8px 25px rgba(0, 0, 0, .3);">
+                        <span class="relative z-10">Acceder</span>
+                    </button>
+                    
+                    <!-- Glow effect interno -->
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                         style="background: radial-gradient(circle at 50% 0%, rgba(107, 225, 227, .4), transparent 60%);"></div>
+                </div>
+
+                <!-- User Card -->
+                <div class="card-user group relative rounded-2xl p-8 transition-all duration-500 hover:-translate-y-3 animate-fade-in-up delay-500"
+                     style="background: linear-gradient(135deg, rgba(254, 254, 255, .08), rgba(254, 254, 255, .05)); backdrop-filter: blur(20px); border: 1px solid rgba(198, 201, 215, .25); box-shadow: 0 10px 40px rgba(0, 0, 0, .4);"
+                     data-role="user">
+                    
+                    <!-- Top gradient line -->
+                    <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-one-gold via-one-gold to-transparent"></div>
+                    
+                    <!-- Icon -->
+                    <div class="card-icon-wrapper mb-6">
+                        <div class="card-icon w-20 h-20 mx-auto rounded-2xl flex items-center justify-center"
+                             style="background: linear-gradient(135deg, rgba(228, 199, 106, .2), rgba(228, 199, 106, .1)); border: 1px solid rgba(228, 199, 106, .3); box-shadow: 0 0 30px rgba(228, 199, 106, .2);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e4c76a" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <h2 class="font-one text-2xl font-bold text-white mb-3 text-center">
+                        Usuario
+                    </h2>
+                    <p class="text-one-mist/70 text-sm text-center mb-6 leading-relaxed">
+                        Realizar test Eneagrama y visualizar mi informe
+                    </p>
+                    
+                    <!-- Button -->
+                    <button onclick="goToLogin('user')" 
+                            class="btn-glow btn-user relative w-full py-3.5 px-6 rounded-full font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95"
+                            style="background: rgba(228, 199, 106, .15); border: 1px solid rgba(228, 199, 106, .35); box-shadow: 0 8px 25px rgba(0, 0, 0, .3);">
+                        <span class="relative z-10">Acceder</span>
+                    </button>
+                    
+                    <!-- Glow effect interno -->
+                    <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none rounded-2xl"
+                         style="background: radial-gradient(circle at 50% 0%, rgba(228, 199, 106, .4), transparent 60%);"></div>
+                </div>
+                
+            </div>
+
+            <!-- Footer -->
+            <footer class="text-center py-8">
+                <div class="inline-flex flex-col items-center gap-2 px-6 py-4 rounded-2xl animate-fade-in-up delay-500"
+                     style="background: rgba(254, 254, 255, 0.04); backdrop-filter: blur(12px); border: 1px solid rgba(198, 201, 215, 0.12);">
+                    <p class="text-one-mist/60 text-sm">
+                        © 2026 Eneagrama | One Platform. Todos los derechos reservados.
+                    </p>
+                    <p class="text-xs text-one-mist/40">
+                        Powered by <span class="text-one-cyan font-semibold">ONE</span> Platform — Todos los derechos reservados
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // Función original de navegación
+        // ========================================
+        function goToLogin(role) {
+            // Guardar el rol seleccionado
+            sessionStorage.setItem('selectedRole', role);
+            
+            // Redirigir al login
+            window.location.href = '../login.html';
+        }
+        
+        // ========================================
+        // Efectos de entrada
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Las animaciones ya están aplicadas via CSS
+            console.log('Eneagrama | ONE Platform - Página de selección de perfil cargada con animaciones y efectos visuales.');
+        });
+    </script>
+</body>
+</html>

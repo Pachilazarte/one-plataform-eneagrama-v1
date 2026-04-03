@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Organizacional — ONE Eneagrama</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'one-cyan':'#6be1e3','one-pink':'#e17bd7','one-gold':'#e4c76a',
+            'one-slate':'#a4a8c0','one-mist':'#c6c9d7','one-ink':'#1a181d',
+            'one-green':'#50fa7b','one-red':'#ff5555','one-orange':'#ffb86c',
+          },
+          fontFamily: { 'exo':['"Exo 2"','system-ui','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./style.css" />
+  <script src="../../Marca.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/helpers.js"></script>
+</head>
+<body class="font-exo bg-black text-white min-h-screen overflow-x-hidden">
+
+  <!-- FONDO idéntico al AdminDashboard -->
+  <div class="fixed inset-0 -z-20 bg-gradient-to-br from-black via-one-ink to-black"></div>
+  <div class="fixed inset-0 -z-10 bg-pattern opacity-95 blur-[18px]"></div>
+  <div class="fixed inset-[-20%] -z-10 hex-pattern opacity-[0.16] mix-blend-screen transform rotate-[-8deg]"></div>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between gap-3">
+
+        <div class="flex items-center gap-3">
+          <img src="../../img/one-logocolor.png" alt="ONE" class="w-10 h-10 object-contain flex-shrink-0">
+          <div class="hidden sm:block">
+            <h2 class="font-exo text-sm font-extrabold tracking-widest bg-gradient-to-r from-one-cyan to-one-pink bg-clip-text text-transparent uppercase leading-tight">
+              Dashboard Organizacional
+            </h2>
+            <p class="text-[10px] text-one-slate">Análisis sistémico del equipo · ONE Eneagrama</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <div class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-one-cyan/10 border border-one-cyan/20 text-one-cyan text-[11px] font-semibold" id="adminName">—</div>
+
+          <!-- Tabs -->
+          <div class="flex items-center gap-0.5 bg-white/5 rounded-lg p-1 border border-white/10">
+            <button class="tab-btn active" onclick="switchSection('overview')">General</button>
+            <button class="tab-btn" onclick="switchSection('equipo')">Equipo</button>
+            <button class="tab-btn" onclick="switchSection('gestion')">Gestión</button>
+            <button class="tab-btn" onclick="switchSection('cultura')">Cultura</button>
+          </div>
+
+          <button onclick="reloadData()"
+            class="px-2.5 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 transition-all text-[11px] font-semibold flex items-center gap-1.5 text-gray-300 hover:text-white">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span class="hidden sm:inline">Actualizar</span>
+          </button>
+
+          <button onclick="window.location.href='../../AdminDashboard/index.html'"
+            class="px-2.5 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 transition-all text-[11px] font-semibold flex items-center gap-1.5 hover:-translate-y-0.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            <span class="hidden sm:inline">Panel Admin</span>
+          </button>
+
+          <button onclick="Auth.logout()"
+            class="px-2.5 py-1.5 rounded-lg bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-all text-[11px] font-semibold flex items-center gap-1.5">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Salir
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Loading (oculto — overlay del AdminDashboard lo reemplaza) -->
+  <div id="loadingScreen" style="display:none"></div>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8" id="mainContent" style="display:none">
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN: VISTA GENERAL
+    ══════════════════════════════════════════ -->
+    <div id="section-overview" class="section-pane">
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        <div class="stat-card from-blue-600/10 to-blue-700/10 border-blue-500/20">
+          <div class="w-11 h-11 rounded-xl bg-blue-500/20 flex items-center justify-content-center text-xl flex-shrink-0 flex items-center justify-center">👥</div>
+          <div><h3 id="statTotal" class="text-2xl font-black text-blue-400">0</h3><p class="stat-lbl">Evaluados</p></div>
+        </div>
+        <div class="stat-card from-purple-600/10 to-purple-700/10 border-purple-500/20">
+          <div class="w-11 h-11 rounded-xl bg-purple-500/20 flex items-center justify-center text-xl flex-shrink-0">🧩</div>
+          <div><h3 id="statTypes" class="text-2xl font-black text-purple-400">0</h3><p class="stat-lbl">Tipos presentes</p></div>
+        </div>
+        <div class="stat-card from-one-gold/10 to-yellow-700/10 border-one-gold/20">
+          <div class="w-11 h-11 rounded-xl bg-one-gold/20 flex items-center justify-center text-xl flex-shrink-0">⭐</div>
+          <div><h3 id="statDominant" class="text-sm font-black text-one-gold leading-tight">—</h3><p class="stat-lbl">Tipo dominante</p></div>
+        </div>
+        <div class="stat-card from-green-600/10 to-green-700/10 border-green-500/20">
+          <div class="w-11 h-11 rounded-xl bg-green-500/20 flex items-center justify-center text-xl flex-shrink-0">🔺</div>
+          <div><h3 id="statTriada" class="text-sm font-black text-green-400 leading-tight">—</h3><p class="stat-lbl">Tríada dominante</p></div>
+        </div>
+        <div class="stat-card col-span-2 lg:col-span-1 from-one-cyan/10 to-cyan-700/10 border-one-cyan/20">
+          <div class="w-11 h-11 rounded-xl bg-one-cyan/20 flex items-center justify-center text-xl flex-shrink-0">📊</div>
+          <div><h3 id="statDiversidad" class="text-sm font-black text-one-cyan leading-tight">—</h3><p class="stat-lbl">Índice diversidad</p></div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid lg:grid-cols-3 gap-4 mb-6">
+        <div class="lg:col-span-2 panel-card">
+          <div class="panel-header">
+            <h3 class="panel-title">Distribución de Eneatipos</h3>
+            <div class="flex gap-1.5">
+              <button id="btnBar" onclick="switchChart('bar')" class="chart-tog active">Barras</button>
+              <button id="btnRadar" onclick="switchChart('radar')" class="chart-tog">Radar</button>
+            </div>
+          </div>
+          <div class="p-5" style="height:290px;position:relative"><canvas id="chartMain"></canvas></div>
+        </div>
+        <div class="panel-card">
+          <div class="panel-header"><h3 class="panel-title">Tríadas del Equipo</h3></div>
+          <div class="p-5">
+            <div style="height:170px;position:relative"><canvas id="chartTriadas"></canvas></div>
+            <div class="mt-3 space-y-2" id="triadaLegend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-extrabold tracking-wide">Análisis Organizacional</h2>
+          <span class="px-3 py-1 rounded-full bg-one-cyan/10 border border-one-cyan/20 text-one-cyan text-[10px] font-semibold">Generado según perfil del equipo</span>
+        </div>
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-3" id="insightsGrid"></div>
+      </div>
+
+      <!-- Compatibilidad -->
+      <div>
+        <h2 class="text-sm font-extrabold tracking-wide mb-4">Compatibilidad y Potencial</h2>
+        <div class="grid md:grid-cols-2 gap-3">
+          <div class="panel-card p-5"><div class="c-title">🏆 Potenciales Líderes</div><div class="space-y-2 mt-3" id="leadersList"></div></div>
+          <div class="panel-card p-5"><div class="c-title">🤝 Mejores Duplas de Trabajo</div><div class="space-y-2 mt-3" id="duplasList"></div></div>
+          <div class="panel-card p-5"><div class="c-title">⚠️ Tensiones a Gestionar</div><div class="space-y-2 mt-3" id="tensionsList"></div></div>
+          <div class="panel-card p-5"><div class="c-title">🌱 Gaps del Equipo</div><div class="space-y-2 mt-3" id="gapsList"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /overview -->
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN: EQUIPO
+    ══════════════════════════════════════════ -->
+    <div id="section-equipo" class="section-pane hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <h2 class="text-sm font-extrabold tracking-wide">Perfiles del Equipo</h2>
+        <div class="flex flex-wrap gap-2">
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="searchPerson" type="text" placeholder="Buscar persona..."
+              class="pl-8 pr-3 py-1.5 rounded-lg bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none text-xs text-white placeholder-gray-500 w-40"
+              oninput="filterTeam()">
+          </div>
+          <select id="filterTriada" onchange="filterTeam()" class="filter-sel">
+            <option value="">Todas las tríadas</option>
+            <option value="Cuerpo">Cuerpo (1,8,9)</option>
+            <option value="Corazon">Corazón (2,3,4)</option>
+            <option value="Cabeza">Cabeza (5,6,7)</option>
+          </select>
+          <select id="filterType" onchange="filterTeam()" class="filter-sel">
+            <option value="">Todos los tipos</option>
+            <option value="1">T1 · Reformador</option><option value="2">T2 · Ayudador</option>
+            <option value="3">T3 · Triunfador</option><option value="4">T4 · Individualista</option>
+            <option value="5">T5 · Investigador</option><option value="6">T6 · Leal</option>
+            <option value="7">T7 · Entusiasta</option><option value="8">T8 · Desafiador</option>
+            <option value="9">T9 · Pacificador</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" id="teamGrid"></div>
+    </div><!-- /equipo -->
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN: GESTIÓN
+    ══════════════════════════════════════════ -->
+    <div id="section-gestion" class="section-pane hidden">
+
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-extrabold tracking-wide">Gestión de Personas · Visión Sistémica</h2>
+        <span class="text-[10px] text-one-slate hidden sm:block">Eneagrama aplicado a Gestión de RRHH</span>
+      </div>
+
+      <!-- Tabla de perfiles -->
+      <div class="panel-card overflow-hidden mb-5">
+        <div class="panel-header"><h3 class="panel-title">Tabla de Perfiles del Equipo</h3></div>
+        <div class="overflow-x-auto">
+          <table class="table w-full text-xs" style="table-layout:fixed;min-width:800px">
+            <thead class="bg-gradient-to-r from-one-ink via-one-pink/20 to-one-ink">
+              <tr>
+                <th style="width:18%;padding:10px 14px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Persona</th>
+                <th style="width:13%;padding:10px 14px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Tipo</th>
+                <th style="width:16%;padding:10px 14px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Rol natural</th>
+                <th style="width:20%;padding:10px 14px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Motivador</th>
+                <th style="width:20%;padding:10px 14px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Punto ciego</th>
+                <th style="width:8%;padding:10px 14px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Liderazgo</th>
+                <th style="width:5%;padding:10px 14px;text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#a4a8c0">Ver</th>
+              </tr>
+            </thead>
+            <tbody id="rrhhTable" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Feedback 1:1 -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-cyan">🎯 Cómo dar feedback 1:1 por eneatipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Guía de comunicación individualizada para conversaciones de desempeño y desarrollo, adaptada al patrón tipológico de cada persona.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="feedback11Grid"></div>
+      </div>
+
+      <!-- Señales de burnout -->
+      <div class="panel-card p-5 mb-5" style="border-color:rgba(255,85,85,0.15)">
+        <div class="sec-label text-red-400">⚠️ Señales de burnout por eneatipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Cada eneatipo muestra el estrés de manera diferente. Conocer estos patrones permite intervenir antes de que el agotamiento sea irreversible.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="burnoutGrid"></div>
+      </div>
+
+      <!-- Retención -->
+      <div class="panel-card p-5 mb-5" style="border-color:rgba(80,250,123,0.15)">
+        <div class="sec-label text-one-green">🌱 Estrategias de retención por eneatipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Qué necesita cada tipo para quedarse y dar lo mejor. El talento no se va de las empresas, se va de los contextos que no lo comprenden.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="retencionGrid"></div>
+      </div>
+
+      <!-- Gestión del conflicto -->
+      <div class="panel-card p-5 mb-5" style="border-color:rgba(228,199,106,0.15)">
+        <div class="sec-label text-one-gold">⚡ Gestión del conflicto por eneatipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Cómo se comporta cada tipo en situaciones de tensión y qué estrategia de mediación es más efectiva para cada patrón.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="conflictoGrid"></div>
+      </div>
+
+      <!-- Cómo liderar -->
+      <div class="panel-card p-5 mb-5" style="border-color:rgba(107,225,227,0.15)">
+        <div class="sec-label text-one-cyan">👑 Cómo liderar a cada eneatipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">El liderazgo efectivo es personalizado. Lo que motiva a un T3 puede desmotivar a un T5. Esta guía adapta el estilo de conducción a cada tipo.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="liderarGrid"></div>
+      </div>
+
+      <!-- Evaluación de desempeño -->
+      <div class="panel-card p-5 mb-5" style="border-color:rgba(225,123,215,0.15)">
+        <div class="sec-label text-one-pink">📋 Evaluación de desempeño · Qué esperar por tipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Cada eneatipo aporta y falla de maneras predecibles. Conocer estos patrones permite diseñar evaluaciones más justas y criterios más pertinentes.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="desempenoGrid"></div>
+      </div>
+
+      <!-- Armado de equipos de proyecto -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-orange">🔧 Armado de equipos de proyecto según tipos presentes</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Recomendaciones para combinar perfiles tipológicos en proyectos específicos, basadas en la composición real del equipo.</p>
+        <div id="equiposProyectoGrid" class="space-y-3"></div>
+      </div>
+
+      <!-- Capacitación recomendada -->
+      <div class="panel-card p-5">
+        <div class="sec-label text-one-gold">📚 Recomendaciones de capacitación por tipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Formatos, metodologías y contenidos que mejor resuenan con cada eneatipo. La capacitación tiene mayor impacto cuando respeta el estilo de aprendizaje.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3" id="capacitacionGrid"></div>
+      </div>
+
+    </div><!-- /gestion -->
+
+    <!-- ══════════════════════════════════════════
+         SECCIÓN: CULTURA
+    ══════════════════════════════════════════ -->
+    <div id="section-cultura" class="section-pane hidden">
+
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-extrabold tracking-wide">Cultura y Clima Organizacional</h2>
+        <span class="text-[10px] text-one-slate hidden sm:block">Análisis sistémico basado en composición de eneatipos</span>
+      </div>
+
+      <!-- Charts -->
+      <div class="grid lg:grid-cols-2 gap-4 mb-5">
+        <div class="panel-card overflow-hidden">
+          <div class="panel-header"><h3 class="panel-title">Radar de Clima Organizacional</h3></div>
+          <div class="p-5" style="height:250px;position:relative"><canvas id="chartClima"></canvas></div>
+        </div>
+        <div class="panel-card overflow-hidden">
+          <div class="panel-header"><h3 class="panel-title">Mapa de Energía del Equipo</h3></div>
+          <div class="p-5" style="height:250px;position:relative"><canvas id="chartEnergia"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Convivencia -->
+      <div class="grid md:grid-cols-3 gap-3 mb-5" id="convivenciaGrid"></div>
+
+      <!-- Dinámicas -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-cyan">⚡ Dinámicas naturales del equipo</div>
+        <div class="grid md:grid-cols-2 gap-3 mt-4" id="dinamicasGrid"></div>
+      </div>
+
+      <!-- Clima laboral profundo -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-pink">🌡️ Análisis de Clima Laboral por Tríada</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">El clima que vive el equipo cotidianamente está moldeado por la tríada predominante. Estas son las características, riesgos y oportunidades específicas.</p>
+        <div id="climaTriadaGrid" class="space-y-3"></div>
+      </div>
+
+      <!-- Confrontación y poder -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-orange">🔥 Confrontación, poder y autoridad en el equipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Análisis de cómo se maneja la autoridad, el disenso y la confrontación según los tipos presentes. Incluye alertas y recomendaciones de gestión.</p>
+        <div id="confrontacionGrid" class="space-y-3"></div>
+      </div>
+
+      <!-- Guía de comunicación -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-pink">💬 Guía de comunicación efectiva por tipo</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Cómo llegar a cada persona. Estas recomendaciones aplican tanto en comunicación formal como informal, individual y grupal.</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4" id="comunicacionGuide"></div>
+      </div>
+
+      <!-- Rituales recomendados -->
+      <div class="panel-card p-5 mb-5">
+        <div class="sec-label text-one-gold">🎯 Rituales y prácticas organizacionales recomendadas</div>
+        <p class="text-[11px] text-one-slate mb-4 mt-1">Rutinas, instancias y rituales específicos que se recomiendan para este equipo basados en su perfil tipológico colectivo.</p>
+        <div id="ritualesGrid" class="grid sm:grid-cols-2 gap-3 mt-4"></div>
+      </div>
+
+      <!-- Puntos críticos -->
+      <div class="panel-card p-5">
+        <div class="sec-label text-one-orange">⚠️ Puntos críticos de convivencia</div>
+        <div class="space-y-3 mt-4" id="puntosCriticos"></div>
+      </div>
+
+    </div><!-- /cultura -->
+
+  </main>
+
+  <!-- MODAL PERSONA -->
+  <div id="personModalOverlay" class="fixed inset-0 z-[400] hidden pointer-events-none">
+    <div id="modalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm hidden" onclick="closePersonModal()"></div>
+    <div id="personModalBox"
+      class="absolute bottom-4 right-4 w-[430px] max-h-[74vh] flex flex-col rounded-2xl border border-white/12 bg-one-ink shadow-[0_20px_60px_rgba(0,0,0,0.75)] overflow-hidden transition-all duration-300"
+      style="pointer-events:auto">
+      <!-- Barra -->
+      <div class="flex items-center justify-between px-4 py-2.5 bg-gradient-to-r from-one-cyan/10 to-one-pink/10 border-b border-white/10 flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-one-cyan animate-pulse"></span>
+          <span class="text-[11px] font-bold text-one-slate tracking-wide truncate max-w-[240px]" id="modalPersonTitle">Perfil</span>
+        </div>
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <button onclick="expandPersonModal()" id="btnExpand" title="Pantalla completa"
+            class="w-6 h-6 rounded-md bg-white/5 border border-white/10 hover:bg-one-cyan/20 hover:border-one-cyan/30 hover:text-one-cyan text-one-slate flex items-center justify-center transition-all">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+          </button>
+          <button onclick="closePersonModal()" title="Cerrar"
+            class="w-6 h-6 rounded-md bg-white/5 border border-white/10 hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400 text-one-slate flex items-center justify-center transition-all">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <!-- Cuerpo -->
+      <div class="flex-1 overflow-y-auto p-4 custom-scroll" id="personModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[600] flex flex-col gap-2 pointer-events-none"></div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

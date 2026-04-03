@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ONE — Plataforma de Evaluación Eneagrama</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./img/favicon.png" sizes="32x32">
+  <link rel="shortcut icon" href="./img/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="./img/favicon.png">
+
+  <!-- EXO 2 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Estilos originales -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Scripts originales -->
+  <script src="./Marca.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/helpers.js"></script>
+
+  <style>
+    /* ── VARIABLES ENEAGRAMA ── */
+    :root {
+      --enea-1:  #e05c5c; /* Reformador   */
+      --enea-2:  #e07a5c; /* Ayudador      */
+      --enea-3:  #e0a85c; /* Triunfador    */
+      --enea-4:  #7c6fcd; /* Individualista*/
+      --enea-5:  #5c8be0; /* Investigador  */
+      --enea-6:  #5cb8e0; /* Leal          */
+      --enea-7:  #5ce07a; /* Entusiasta    */
+      --enea-8:  #c05ce0; /* Desafiador    */
+      --enea-9:  #8cb87a; /* Pacificador   */
+      --grad-gold: linear-gradient(135deg, #f5c842, #e89a20);
+    }
+
+    /* Grilla de los 9 eneatipos en el hero */
+    .enea-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .enea-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      padding: 0.85rem 1rem;
+      transition: transform .2s, box-shadow .2s;
+      cursor: default;
+    }
+    .enea-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
+
+    .enea-top {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .enea-ico {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .85rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* Colores por número */
+    .e1 { background: var(--enea-1); }
+    .e2 { background: var(--enea-2); }
+    .e3 { background: var(--enea-3); }
+    .e4 { background: var(--enea-4); }
+    .e5 { background: var(--enea-5); }
+    .e6 { background: var(--enea-6); }
+    .e7 { background: var(--enea-7); }
+    .e8 { background: var(--enea-8); }
+    .e9 { background: var(--enea-9); }
+
+    .enea-title {
+      font-size: .8rem;
+      font-weight: 700;
+      color: #e8e8f0;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .enea-text {
+      font-size: .72rem;
+      color: rgba(200,200,220,.75);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* ── SECCIÓN TIPOS COMPLETA ── */
+    .tipos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .tipo-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 18px;
+      padding: 1.4rem 1.5rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .tipo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(0,0,0,.4);
+    }
+
+    .tipo-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .tipo-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .tipo-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e8e8f0;
+      margin: 0 0 .15rem;
+    }
+
+    .tipo-aka {
+      font-size: .78rem;
+      color: rgba(200,200,220,.65);
+      margin: 0;
+    }
+
+    .tipo-stats {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .tipo-stat {
+      display: flex;
+      flex-direction: column;
+      gap: .1rem;
+    }
+
+    .stat-label {
+      font-size: .68rem;
+      color: rgba(200,200,220,.5);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .stat-val {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #c8c8dc;
+    }
+
+    .tipo-desc {
+      font-size: .82rem;
+      color: rgba(200,200,220,.78);
+      line-height: 1.55;
+      margin: 0 0 .9rem;
+    }
+
+    .tipo-fear {
+      font-size: .78rem;
+      color: rgba(200,200,220,.6);
+      background: rgba(255,255,255,.04);
+      border-radius: 8px;
+      padding: .55rem .8rem;
+      line-height: 1.4;
+    }
+
+    .tipo-fear .fear-label {
+      font-weight: 700;
+      color: rgba(200,200,220,.85);
+      margin-right: .3em;
+    }
+
+    /* Colores borde lateral por tipo */
+    .tipo-card.t1 { border-left: 3px solid var(--enea-1); }
+    .tipo-card.t2 { border-left: 3px solid var(--enea-2); }
+    .tipo-card.t3 { border-left: 3px solid var(--enea-3); }
+    .tipo-card.t4 { border-left: 3px solid var(--enea-4); }
+    .tipo-card.t5 { border-left: 3px solid var(--enea-5); }
+    .tipo-card.t6 { border-left: 3px solid var(--enea-6); }
+    .tipo-card.t7 { border-left: 3px solid var(--enea-7); }
+    .tipo-card.t8 { border-left: 3px solid var(--enea-8); }
+    .tipo-card.t9 { border-left: 3px solid var(--enea-9); }
+
+    /* ── ALAS ── */
+    .alas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-top: 2rem;
+    }
+
+    .ala-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.1rem 1.3rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .ala-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .82rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .ala-info .ala-name {
+      font-size: .88rem;
+      font-weight: 700;
+      color: #e0e0f0;
+      margin: 0 0 .3rem;
+    }
+
+    .ala-info p {
+      font-size: .78rem;
+      color: rgba(200,200,220,.7);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    /* responsive hero grid */
+    @media (max-width: 640px) {
+      .enea-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background (idéntico al original) -->
+  <div class="bg" aria-hidden="true">
+    <canvas id="stars"></canvas>
+    <div class="hex"></div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ══════════════════════════════════════
+         HEADER
+         ══════════════════════════════════════ -->
+    <header id="header">
+      <div class="nav">
+        <div class="brand" aria-label="Marca ONE">
+          <div class="mark" aria-hidden="true"></div>
+          <div>
+            <div class="name">ONE</div>
+            <span class="sub">Evaluación Eneagrama</span>
+          </div>
+        </div>
+
+        <nav aria-label="Navegación principal">
+          <a href="#inicio">Inicio</a>
+          <a href="#que-es">¿Qué es?</a>
+          <a href="#los-9-tipos">Los 9 Tipos</a>
+          <a href="#alas">Las Alas</a>
+          <a href="#como-funciona">Cómo Funciona</a>
+        </nav>
+
+        <div class="header-cta">
+          <a class="btn-link" onclick="openLoginModal('admin')" href="#"><span>Acceder como Admin</span></a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════════
+         HERO
+         ══════════════════════════════════════ -->
+    <main>
+      <section class="hero" id="inicio">
+        <div class="copy">
+          <div class="eyebrow">
+            <span class="dot" aria-hidden="true"></span>
+            Evaluación de personalidad Eneagrama
+          </div>
+
+          <h1>
+            Descubrí tu tipo de<br />
+            <span class="grad-cyan">personalidad</span> <span class="grad-pink">Eneagrama.</span>
+          </h1>
+
+          <p class="lead">
+            Plataforma de evaluación basada en el Eneagrama de la Personalidad.
+            Identificá tu eneatipo — del 1 al 9 — y tus dos alas, comprendé tus
+            motivaciones profundas y desbloqueá tu potencial de crecimiento.
+          </p>
+
+          <div class="cta">
+            <a class="btn primary" onclick="openLoginModal('user')" href="#"><span>Realizar mi Evaluación Eneagrama</span></a>
+            <a class="btn secondary" onclick="openLoginModal('admin')" href="#"><span>Acceder como Admin</span></a>
+          </div>
+
+          <div class="hint">
+            Conocerse a uno mismo es el principio de toda sabiduría ✨
+          </div>
+        </div>
+
+        <div class="visual" id="visual">
+          <div class="hud" aria-hidden="true"></div>
+
+          <div class="enea-grid">
+            <!-- Tipo 1 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e1" aria-hidden="true">1</div>
+                <h3 class="enea-title">El Reformador</h3>
+              </div>
+              <p class="enea-text">Ético, perfeccionista y orientado a la mejora continua.</p>
+            </article>
+
+            <!-- Tipo 2 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e2" aria-hidden="true">2</div>
+                <h3 class="enea-title">El Ayudador</h3>
+              </div>
+              <p class="enea-text">Generoso, empático y orientado al servicio de los demás.</p>
+            </article>
+
+            <!-- Tipo 3 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e3" aria-hidden="true">3</div>
+                <h3 class="enea-title">El Triunfador</h3>
+              </div>
+              <p class="enea-text">Ambicioso, adaptable y orientado al éxito y los logros.</p>
+            </article>
+
+            <!-- Tipo 4 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e4" aria-hidden="true">4</div>
+                <h3 class="enea-title">El Individualista</h3>
+              </div>
+              <p class="enea-text">Sensible, introspectivo y en búsqueda de su identidad.</p>
+            </article>
+
+            <!-- Tipo 5 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e5" aria-hidden="true">5</div>
+                <h3 class="enea-title">El Investigador</h3>
+              </div>
+              <p class="enea-text">Cerebral, curioso e innovador. Acumula conocimiento.</p>
+            </article>
+
+            <!-- Tipo 6 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e6" aria-hidden="true">6</div>
+                <h3 class="enea-title">El Leal</h3>
+              </div>
+              <p class="enea-text">Comprometido, responsable y orientado a la seguridad.</p>
+            </article>
+
+            <!-- Tipo 7 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e7" aria-hidden="true">7</div>
+                <h3 class="enea-title">El Entusiasta</h3>
+              </div>
+              <p class="enea-text">Espontáneo, optimista y siempre en busca de nuevas experiencias.</p>
+            </article>
+
+            <!-- Tipo 8 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e8" aria-hidden="true">8</div>
+                <h3 class="enea-title">El Desafiador</h3>
+              </div>
+              <p class="enea-text">Poderoso, decidido y protector de quienes le importan.</p>
+            </article>
+
+            <!-- Tipo 9 -->
+            <article class="enea-card">
+              <div class="enea-top">
+                <div class="enea-ico e9" aria-hidden="true">9</div>
+                <h3 class="enea-title">El Pacificador</h3>
+              </div>
+              <p class="enea-text">Estable, bondadoso y mediador natural en los conflictos.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           SECCIÓN: ¿QUÉ ES EL ENEAGRAMA?
+           ══════════════════════════════════════ -->
+      <section class="section" id="que-es">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="eyebrow">
+              <span class="dot" aria-hidden="true"></span>
+              Sabiduría milenaria
+            </div>
+            <h2 class="section-title">
+              ¿Qué es el <span class="grad-cyan">Eneagrama</span>?
+            </h2>
+            <p class="section-lead">
+              El Eneagrama de la Personalidad es una herramienta de autoconocimiento que
+              describe nueve tipos de personalidad interconectados. No es un test de
+              categorías fijas — es un mapa dinámico de motivaciones, miedos y potencialidades
+              que revela cómo percibimos el mundo y por qué actuamos como actuamos.
+            </p>
+          </div>
+
+          <div class="info-grid">
+            <article class="info-card">
+              <div class="info-icon">🧭</div>
+              <h3 class="info-title">Un mapa del psiquismo</h3>
+              <p class="info-text">
+                Cada eneatipo describe un modelo mental distinto: una forma de filtrar
+                la realidad, de relacionarse, de tomar decisiones y de reaccionar ante
+                el estrés o el bienestar.
+              </p>
+            </article>
+
+            <article class="info-card">
+              <div class="info-icon">🌀</div>
+              <h3 class="info-title">9 tipos + 2 alas cada uno</h3>
+              <p class="info-text">
+                Cada persona tiene un eneatipo dominante y se ve influenciada por uno o
+                ambos tipos adyacentes — llamados "alas" — que matizan y enriquecen su
+                perfil de personalidad.
+              </p>
+            </article>
+
+            <article class="info-card">
+              <div class="info-icon">🔄</div>
+              <h3 class="info-title">Crecimiento y desintegración</h3>
+              <p class="info-text">
+                El Eneagrama muestra cómo cada tipo evoluciona en condiciones de bienestar
+                (integración) y cómo regresa a patrones menos saludables bajo estrés
+                (desintegración), ofreciendo una guía de transformación concreta.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           SECCIÓN: LOS 9 TIPOS
+           ══════════════════════════════════════ -->
+      <section class="section" id="los-9-tipos">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="eyebrow">
+              <span class="dot dot-pink" aria-hidden="true"></span>
+              Los nueve eneatipos
+            </div>
+            <h2 class="section-title">
+              Conocé cada <span class="grad-pink">tipo</span> en profundidad
+            </h2>
+            <p class="section-lead">
+              Cada eneatipo tiene motivaciones únicas, un miedo básico inconsciente,
+              una virtud central y un camino de crecimiento propio.
+              Entenderlos transforma la manera en que te relacionás con vos mismo y con los demás.
+            </p>
+          </div>
+
+          <div class="tipos-grid">
+
+            <!-- TIPO 1 -->
+            <article class="tipo-card t1">
+              <div class="tipo-header">
+                <div class="tipo-badge e1">1</div>
+                <div>
+                  <h3 class="tipo-name">El Reformador</h3>
+                  <p class="tipo-aka">Idealista · Perfeccionista</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Instintivo</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Serenidad</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Ira</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Ético, organizado y con un fuerte sentido del bien y el mal.
+                Se esfuerza por mejorar el mundo y teme cometer errores.
+                Su crítica constante — hacia sí mismo y los demás — puede generar tensión.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                Ser imperfecto, corrupto o malo
+              </div>
+            </article>
+
+            <!-- TIPO 2 -->
+            <article class="tipo-card t2">
+              <div class="tipo-header">
+                <div class="tipo-badge e2">2</div>
+                <div>
+                  <h3 class="tipo-name">El Ayudador</h3>
+                  <p class="tipo-aka">Generoso · Orientado a los demás</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Emocional</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Humildad</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Orgullo</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Comprensivo, bondadoso y abnegado. Hace cosas por los demás para
+                sentirse necesitado, pero suele olvidar sus propias necesidades.
+                Su aprendizaje: dar sin esperar nada a cambio.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                No ser amado ni deseado por los demás
+              </div>
+            </article>
+
+            <!-- TIPO 3 -->
+            <article class="tipo-card t3">
+              <div class="tipo-header">
+                <div class="tipo-badge e3">3</div>
+                <div>
+                  <h3 class="tipo-name">El Triunfador</h3>
+                  <p class="tipo-aka">Adaptable · Orientado al éxito</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Emocional</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Autenticidad</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Engaño</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Ambicioso, encantador y muy consciente de su imagen. Confunde el
+                ser admirado con ser amado. Cuando integra, descubre que su valor
+                no depende de sus logros.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                No tener valor intrínseco más allá de sus logros
+              </div>
+            </article>
+
+            <!-- TIPO 4 -->
+            <article class="tipo-card t4">
+              <div class="tipo-header">
+                <div class="tipo-badge e4">4</div>
+                <div>
+                  <h3 class="tipo-name">El Individualista</h3>
+                  <p class="tipo-aka">Romántico · Introspectivo</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Emocional</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Ecuanimidad</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Envidia</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Sensible, creativo y profundamente consciente de sí mismo. Busca
+                singularidad y teme ser ordinario. Tiene un don especial para
+                transformar el dolor en belleza y significado.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                No tener identidad propia ni significado personal
+              </div>
+            </article>
+
+            <!-- TIPO 5 -->
+            <article class="tipo-card t5">
+              <div class="tipo-header">
+                <div class="tipo-badge e5">5</div>
+                <div>
+                  <h3 class="tipo-name">El Investigador</h3>
+                  <p class="tipo-aka">Cerebral · Analítico</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Mental</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Desapego</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Avaricia</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Perspicaz, curioso e independiente. Acumula conocimiento como fuente
+                de seguridad. Tiende al aislamiento y a postergar la acción hasta
+                "estar preparado". Su fortaleza: visión pionera e innovación real.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                Ser incapaz, inútil o carente de recursos propios
+              </div>
+            </article>
+
+            <!-- TIPO 6 -->
+            <article class="tipo-card t6">
+              <div class="tipo-header">
+                <div class="tipo-badge e6">6</div>
+                <div>
+                  <h3 class="tipo-name">El Leal</h3>
+                  <p class="tipo-aka">Comprometido · Orientado a la seguridad</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Mental</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Coraje</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Miedo</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Responsable, trabajador y leal. Vive anticipando lo que puede salir
+                mal. Oscila entre la desconfianza y la dependencia de figuras de
+                autoridad. Su valentía emerge cuando enfrenta sus propios miedos.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                No tener soporte, guía ni seguridad en la vida
+              </div>
+            </article>
+
+            <!-- TIPO 7 -->
+            <article class="tipo-card t7">
+              <div class="tipo-header">
+                <div class="tipo-badge e7">7</div>
+                <div>
+                  <h3 class="tipo-name">El Entusiasta</h3>
+                  <p class="tipo-aka">Espontáneo · Versátil</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Mental</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Sobriedad</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Gula</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Optimista, animoso y siempre en busca de nuevas experiencias. Huye
+                del dolor y el aburrimiento lanzándose de proyecto en proyecto.
+                Su integración: aprender a estar presente y profundizar en lo que ama.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                Ser privado del placer, el dolor y la privación
+              </div>
+            </article>
+
+            <!-- TIPO 8 -->
+            <article class="tipo-card t8">
+              <div class="tipo-header">
+                <div class="tipo-badge e8">8</div>
+                <div>
+                  <h3 class="tipo-name">El Desafiador</h3>
+                  <p class="tipo-aka">Poderoso · Dominante</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Instintivo</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Inocencia</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Lujuria</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Seguro, decidido y protector. Necesita estar al mando para evitar ser
+                controlado. Oculta su vulnerabilidad tras una coraza de fuerza. En
+                su mejor expresión: magnánimo, heroico y profundamente humano.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                Ser lastimado, controlado o dominado por otros
+              </div>
+            </article>
+
+            <!-- TIPO 9 -->
+            <article class="tipo-card t9">
+              <div class="tipo-header">
+                <div class="tipo-badge e9">9</div>
+                <div>
+                  <h3 class="tipo-name">El Pacificador</h3>
+                  <p class="tipo-aka">Estable · Conciliador</p>
+                </div>
+              </div>
+              <div class="tipo-stats">
+                <div class="tipo-stat">
+                  <span class="stat-label">Centro</span>
+                  <span class="stat-val">Instintivo</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Virtud</span>
+                  <span class="stat-val">Acción</span>
+                </div>
+                <div class="tipo-stat">
+                  <span class="stat-label">Pasión</span>
+                  <span class="stat-val">Pereza</span>
+                </div>
+              </div>
+              <p class="tipo-desc">
+                Afable, bondadoso y mediador natural. Evita el conflicto cediendo
+                sus propias necesidades. Tiene el don de ver todos los puntos de
+                vista, y al integrarse se convierte en un líder capaz de unir equipos.
+              </p>
+              <div class="tipo-fear">
+                <span class="fear-label">Miedo básico:</span>
+                La pérdida y la separación de los demás
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           SECCIÓN: LAS ALAS
+           ══════════════════════════════════════ -->
+      <section class="section" id="alas">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="eyebrow">
+              <span class="dot dot-gold" aria-hidden="true"></span>
+              Matices del carácter
+            </div>
+            <h2 class="section-title">
+              Las <span class="grad-gold">Alas</span> del Eneagrama
+            </h2>
+            <p class="section-lead">
+              Ningún eneatipo existe en estado puro. Cada tipo se ve enriquecido por uno o
+              ambos tipos adyacentes en el círculo, llamados "alas". Tu perfil completo es
+              la combinación de tu eneatipo dominante más el matiz de tu ala principal.
+            </p>
+          </div>
+
+          <div class="alas-grid">
+
+            <article class="ala-card">
+              <div class="ala-badge e1">1</div>
+              <div class="ala-info">
+                <p class="ala-name">1 con ala 9 · 1 con ala 2</p>
+                <p>El ala 9 lo vuelve más sereno e idealista. El ala 2 lo hace más empático y orientado a mejorar a los demás.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e2">2</div>
+              <div class="ala-info">
+                <p class="ala-name">2 con ala 1 · 2 con ala 3</p>
+                <p>El ala 1 lo hace más austero y principista. El ala 3 lo vuelve más extrovertido, sociable y orientado al reconocimiento.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e3">3</div>
+              <div class="ala-info">
+                <p class="ala-name">3 con ala 2 · 3 con ala 4</p>
+                <p>El ala 2 refuerza el encanto personal. El ala 4 añade profundidad creativa e introspección a su ambición.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e4">4</div>
+              <div class="ala-info">
+                <p class="ala-name">4 con ala 3 · 4 con ala 5</p>
+                <p>El ala 3 lo orienta al logro y la expresión. El ala 5 profundiza su intelectualidad y retiro interior.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e5">5</div>
+              <div class="ala-info">
+                <p class="ala-name">5 con ala 4 · 5 con ala 6</p>
+                <p>El ala 4 añade sensibilidad artística. El ala 6 orienta el conocimiento hacia estructuras colaborativas y lealtad.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e6">6</div>
+              <div class="ala-info">
+                <p class="ala-name">6 con ala 5 · 6 con ala 7</p>
+                <p>El ala 5 lo hace más analítico y reservado. El ala 7 aporta optimismo y capacidad de aventura que contrarresta el miedo.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e7">7</div>
+              <div class="ala-info">
+                <p class="ala-name">7 con ala 6 · 7 con ala 8</p>
+                <p>El ala 6 lo vuelve más comprometido y fiel. El ala 8 agrega determinación, liderazgo y búsqueda de intensidad.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e8">8</div>
+              <div class="ala-info">
+                <p class="ala-name">8 con ala 7 · 8 con ala 9</p>
+                <p>El ala 7 lo hace más expansivo y carismático. El ala 9 templa su intensidad con paciencia y apertura a los demás.</p>
+              </div>
+            </article>
+
+            <article class="ala-card">
+              <div class="ala-badge e9">9</div>
+              <div class="ala-info">
+                <p class="ala-name">9 con ala 8 · 9 con ala 1</p>
+                <p>El ala 8 lo vuelve más asertivo y decidido. El ala 1 añade principios morales y orientación a la mejora colectiva.</p>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
+           SECCIÓN: CÓMO FUNCIONA
+           ══════════════════════════════════════ -->
+      <section class="section" id="como-funciona">
+        <div class="section-container">
+          <div class="section-header">
+            <div class="eyebrow">
+              <span class="dot dot-gold" aria-hidden="true"></span>
+              Simple y profundo
+            </div>
+            <h2 class="section-title">
+              ¿Cómo funciona la <span class="grad-gold">evaluación</span>?
+            </h2>
+            <p class="section-lead">
+              El test Eneagrama se completa en 10-15 minutos y genera un informe detallado
+              con tu eneatipo dominante, tus dos alas posibles, tus direcciones de integración
+              y desintegración, y recomendaciones de crecimiento personalizadas.
+            </p>
+          </div>
+
+          <div class="steps-grid">
+            <article class="step-card">
+              <div class="step-number">01</div>
+              <h3 class="step-title">Recibís tu acceso</h3>
+              <p class="step-text">
+                Tu administrador te crea un usuario y contraseña para ingresar a la plataforma de forma segura.
+              </p>
+            </article>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <article class="step-card">
+              <div class="step-number">02</div>
+              <h3 class="step-title">Completás el test</h3>
+              <p class="step-text">
+                Respondés una serie de afirmaciones sobre tus motivaciones y comportamientos naturales. Sin respuestas correctas ni incorrectas.
+              </p>
+            </article>
+
+            <div class="step-connector" aria-hidden="true"></div>
+
+            <article class="step-card">
+              <div class="step-number">03</div>
+              <h3 class="step-title">Obtenés tu informe</h3>
+              <p class="step-text">
+                Se genera tu perfil Eneagrama completo: eneatipo dominante, alas, direcciones de crecimiento y áreas de desarrollo.
+              </p>
+            </article>
+          </div>
+
+          <div class="cta-center">
+            <a class="btn primary" onclick="openLoginModal('user')" href="#">
+              <span>Comenzar mi Evaluación Eneagrama</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+<!-- FOOTER (idéntico al original) -->
+    <footer class="premium-footer">
+      <div class="footer-container">
+        <div class="footer-left">
+          <img src="./img/one-logoletra.png" alt="ONE" class="footer-logo-letra">
+          <span> | Todos los derechos reservados. © 2026</span>
+        </div>
+
+        <div class="footer-right">
+          <span class="developed-txt">Desarrollado por</span>
+          <a href="https://escencialconsultora.com.ar/" target="_blank" class="dev-link" title="Ir a Escencial">
+            <img src="./img/one-logocolor.png" alt="ONE" class="dev-logo-one">
+            <span class="by-txt">by</span>
+            <img src="./img/escencial-logoblanco.png" alt="Escencial" class="dev-logo-escencial">
+          </a>
+          <span style="font-size:10px;opacity:0.3;margin-left:8px;">v1.0.3</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       MODAL DE LOGIN (idéntico al original)
+       ══════════════════════════════════════ -->
+  <div id="loginModal" class="login-modal">
+    <div class="login-card">
+      <button class="login-close" onclick="closeLoginModal()">×</button>
+
+      <div class="login-logo">
+        <img src="./img/escencial-logoblanco.png" alt="Logo Eneagrama">
+      </div>
+
+      <h2 class="login-title">Iniciar Sesión</h2>
+      <p class="login-subtitle">Evaluación Eneagrama</p>
+
+      <span id="modeBadge" class="mode-badge mode-user">Usuario</span>
+
+      <div id="alertContainer"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="usuario">Usuario</label>
+          <input type="text" id="usuario" class="form-input" placeholder="Ingresa tu usuario" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Contraseña</label>
+          <input type="password" id="password" class="form-input" placeholder="Ingresa tu contraseña" required>
+        </div>
+
+        <button type="submit" class="btn-login">Ingresar</button>
+      </form>
+
+      <div id="loadingContainer" class="hidden loading-text">
+        Verificando credenciales...
+      </div>
+
+      <div class="switch-mode">
+        <button type="button" id="switchModeBtn" onclick="toggleMode()">
+          ¿Eres administrador? Ingresa aquí
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       SCRIPTS (idénticos al original)
+       ══════════════════════════════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Header scroll
+      const header = document.getElementById('header');
+      const onScroll = () => {
+        if (window.scrollY > 10) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // Canvas stars
+      const canvas = document.getElementById('stars');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      let W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
+      let stars = [];
+
+      function resize(){
+        W = window.innerWidth;
+        H = document.documentElement.scrollHeight;
+        DPR = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(W * DPR);
+        canvas.height = Math.floor(H * DPR);
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+        const count = Math.floor(160 * (W * H) / (1200 * 700));
+        stars = Array.from({length: Math.max(100, Math.min(300, count))}, () => ({
+          x: Math.random()*W,
+          y: Math.random()*H,
+          r: Math.random()*1.35 + 0.25,
+          a: Math.random()*0.6 + 0.15,
+          vx: (Math.random()-0.5)*0.06,
+          vy: (Math.random()-0.5)*0.06,
+          tw: Math.random()*0.012 + 0.003
+        }));
+      }
+
+      function draw(){
+        ctx.clearRect(0, 0, W, H);
+        const g = ctx.createRadialGradient(W*0.75, H*0.15, 0, W*0.75, H*0.15, Math.max(W,H)*0.8);
+        g.addColorStop(0, 'rgba(225,123,215,0.10)');
+        g.addColorStop(0.35, 'rgba(107,225,227,0.08)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0,0,W,H);
+
+        for(const s of stars){
+          s.x += s.vx;
+          s.y += s.vy;
+          if(s.x < -10) s.x = W + 10;
+          if(s.x > W + 10) s.x = -10;
+          if(s.y < -10) s.y = H + 10;
+          if(s.y > H + 10) s.y = -10;
+          s.a += Math.sin((s.x + s.y) * 0.002) * s.tw;
+          const alpha = Math.max(0.08, Math.min(0.85, s.a));
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(254,254,255,${alpha})`;
+          ctx.fill();
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      draw();
+      window.addEventListener('resize', resize);
+
+      // Scroll reveal
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observer.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+      // Auth redirect
+      if (typeof Auth !== 'undefined' && Auth.isAuthenticated()) {
+        Auth.redirectToDashboard();
+      }
+    });
+
+    // ── LOGIN MODAL ──
+    let currentMode = 'user';
+
+    function openLoginModal(mode) {
+      currentMode = mode || 'user';
+      const modal = document.getElementById('loginModal');
+      const badge = document.getElementById('modeBadge');
+      const switchBtn = document.getElementById('switchModeBtn');
+
+      if (currentMode === 'admin') {
+        badge.textContent = 'Administrador';
+        badge.className = 'mode-badge mode-admin';
+        switchBtn.textContent = '¿Eres usuario? Ingresa aquí';
+      } else {
+        badge.textContent = 'Usuario';
+        badge.className = 'mode-badge mode-user';
+        switchBtn.textContent = '¿Eres administrador? Ingresa aquí';
+      }
+
+      document.getElementById('alertContainer').innerHTML = '';
+      document.getElementById('usuario').value = '';
+      document.getElementById('password').value = '';
+      modal.classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+    }
+
+    function toggleMode() {
+      const badge = document.getElementById('modeBadge');
+      const switchBtn = document.getElementById('switchModeBtn');
+
+      if (currentMode === 'user') {
+        currentMode = 'admin';
+        badge.textContent = 'Administrador';
+        badge.className = 'mode-badge mode-admin';
+        switchBtn.textContent = '¿Eres usuario? Ingresa aquí';
+      } else {
+        currentMode = 'user';
+        badge.textContent = 'Usuario';
+        badge.className = 'mode-badge mode-user';
+        switchBtn.textContent = '¿Eres administrador? Ingresa aquí';
+      }
+      document.getElementById('alertContainer').innerHTML = '';
+    }
+
+    function showAlert(message, type) {
+      const container = document.getElementById('alertContainer');
+      container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      if (type === 'success') setTimeout(() => { container.innerHTML = ''; }, 3000);
+    }
+
+    function showLoading(show) {
+      const loading = document.getElementById('loadingContainer');
+      const form = document.getElementById('loginForm');
+      if (show) {
+        loading.classList.remove('hidden');
+        form.querySelector('button[type="submit"]').disabled = true;
+      } else {
+        loading.classList.add('hidden');
+        form.querySelector('button[type="submit"]').disabled = false;
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const usuario = document.getElementById('usuario').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!usuario || !password) {
+        showAlert('Por favor completa todos los campos', 'error');
+        return;
+      }
+
+      showLoading(true);
+
+      try {
+        let rol = currentMode === 'user' ? 'user' : 'admin';
+        const result = await Auth.login(usuario, password, rol);
+
+        if (result.success) {
+          showAlert('¡Inicio de sesión exitoso!', 'success');
+          setTimeout(() => { Auth.redirectToDashboard(); }, 800);
+        } else {
+          if (currentMode === 'admin') {
+            const superadminResult = await Auth.login(usuario, password, CONFIG.roles.SUPERADMIN);
+            if (superadminResult.success) {
+              showAlert('¡Inicio de sesión exitoso!', 'success');
+              setTimeout(() => { Auth.redirectToDashboard(); }, 800);
+              return;
+            }
+          }
+          showAlert(result.message || 'Credenciales inválidas', 'error');
+        }
+      } catch (error) {
+        console.error('Error en login:', error);
+        showAlert('Error de conexión. Intenta nuevamente.', 'error');
+      } finally {
+        showLoading(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLoginModal();
+    });
+
+    document.getElementById('loginModal').addEventListener('click', (e) => {
+      if (e.target.id === 'loginModal') closeLoginModal();
+    });
+  </script>
+</body>
+</html>

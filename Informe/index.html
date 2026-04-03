@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <link rel="icon" type="image/png" href="../img/favicon.png" sizes="32x32">
+  <title>Informe de Eneagrama — ONE Platform</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════
+       VARIABLES
+    ═══════════════════════════════════════ */
+    :root {
+      --ink-900:    #210d41;
+      --ink-800:    #252525;
+      --earth-800:  #342f1d;
+      --gray-400:   #c0c0c0;
+      --white:      #ffffff;
+
+      --violet-900: #280640;
+      --violet-700: #47278c;
+      --violet-600: #6e3eab;
+      --magenta-600:#953a90;
+
+      --gold-700:   #b88917;
+      --gold-500:   #e2b808;
+      --gold-300:   #f4ce29;
+
+      --brand-grad: linear-gradient(135deg, #280640 0%, #6e3eab 100%);
+      --dark-bg:    #0a0118;
+      --card-bg:    rgba(255,255,255,0.04);
+      --card-border:rgba(110,62,171,0.25);
+
+      --tipo-color:     #6e3eab;
+      --tipo-color-alt: #47278c;
+
+      --radius:    16px;
+      --radius-sm: 10px;
+      --gap:       2rem;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--dark-bg);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Fondo animado ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(71,39,140,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(149,58,144,0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,184,8,0.08) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Loader ── */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--dark-bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .loader-ring {
+      width: 64px; height: 64px;
+      border: 3px solid rgba(110,62,171,0.2);
+      border-top-color: var(--gold-500);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { color: var(--gray-400); font-size: 0.9rem; letter-spacing: 0.05em; }
+
+    /* ── Report wrapper ── */
+    #report {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 1.5rem 6rem;
+      display: none;
+    }
+
+    /* ════════════════════════════════════════
+       HEADER
+    ════════════════════════════════════════ */
+    .report-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid rgba(110,62,171,0.2);
+      margin-bottom: 3rem;
+    }
+    .brand-logo {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .brand-mark {
+      width: 40px; height: 40px;
+      background: var(--brand-grad);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem; color: var(--gold-500);
+    }
+    .brand-name { font-weight: 800; font-size: 1.3rem; letter-spacing: 0.1em; }
+    .brand-sub { font-size: 0.7rem; color: var(--gray-400); letter-spacing: 0.08em; }
+
+    .header-meta {
+      text-align: right;
+    }
+    .header-meta .user-fullname {
+      font-size: 1rem; font-weight: 700; color: var(--white);
+    }
+    .header-meta .user-info {
+      font-size: 0.75rem; color: var(--gray-400); margin-top: 0.2rem;
+    }
+
+    /* ════════════════════════════════════════
+       HERO TIPO
+    ════════════════════════════════════════ */
+    .hero-tipo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-bottom: 4rem;
+    }
+    @media (max-width: 720px) {
+      .hero-tipo { grid-template-columns: 1fr; }
+    }
+
+    .hero-left {}
+
+    .eyebrow {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold-500);
+      margin-bottom: 1rem;
+    }
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold-500);
+      box-shadow: 0 0 8px var(--gold-500);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .tipo-numero-display {
+      font-size: clamp(5rem, 12vw, 9rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--gold-500);
+      text-shadow: 0 0 40px rgba(226,184,8,0.4), 0 0 80px rgba(226,184,8,0.15);
+      margin-bottom: 0.5rem;
+    }
+
+    .tipo-nombre-display {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--tipo-color) 0%, var(--violet-600) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+
+    .tipo-subtitulo-display {
+      font-size: 0.95rem;
+      color: var(--gray-400);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+
+    .tipo-badges {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .badge {
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-gold {
+      background: rgba(226,184,8,0.12);
+      border-color: rgba(226,184,8,0.4);
+      color: var(--gold-300);
+    }
+    .badge-violet {
+      background: rgba(110,62,171,0.15);
+      border-color: rgba(110,62,171,0.4);
+      color: #c4a0f8;
+    }
+    .badge-magenta {
+      background: rgba(149,58,144,0.12);
+      border-color: rgba(149,58,144,0.35);
+      color: #e89fe4;
+    }
+
+    .tipo-descripcion-hero {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* Score bar */
+    .score-display {
+      display: flex; align-items: center; gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .score-label { font-size: 0.72rem; color: var(--gray-400); white-space: nowrap; }
+    .score-bar {
+      flex: 1; height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--violet-600), var(--gold-500));
+      border-radius: 99px;
+      transition: width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s;
+      box-shadow: 0 0 12px rgba(226,184,8,0.4);
+    }
+    .score-pct { font-size: 0.85rem; font-weight: 700; color: var(--gold-500); }
+
+    /* Wheel side */
+    .hero-right {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wheel-container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* ════════════════════════════════════════
+       SECTION LABEL
+    ════════════════════════════════════════ */
+    .section-label {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    .section-label-line {
+      height: 2px; flex: 1;
+      background: linear-gradient(90deg, var(--tipo-color), transparent);
+    }
+    .section-label-text {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--tipo-color);
+      white-space: nowrap;
+    }
+
+    /* ════════════════════════════════════════
+       CARDS GRID
+    ════════════════════════════════════════ */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--tipo-color), transparent);
+      opacity: 0.6;
+    }
+    .card-title {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--tipo-color);
+      margin-bottom: 1rem;
+    }
+
+    .triada-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+    @media (max-width: 600px) {
+      .triada-grid { grid-template-columns: 1fr; }
+    }
+    .triada-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+    }
+    .triada-icon {
+      font-size: 1.5rem; margin-bottom: 0.5rem;
+    }
+    .triada-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.4rem;
+    }
+    .triada-value {
+      font-size: 0.85rem; font-weight: 500; color: var(--white); line-height: 1.5;
+    }
+
+    /* ════════════════════════════════════════
+       LISTAS
+    ════════════════════════════════════════ */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem;
+    }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+    #lista-fortalezas, #lista-desarrollo {
+      list-style: none; display: flex; flex-direction: column; gap: 0.65rem;
+    }
+    .strength-item, .dev-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      font-size: 0.85rem; line-height: 1.5; color: rgba(255,255,255,0.8);
+    }
+    .strength-item::before {
+      content: '✦';
+      color: var(--gold-500); font-size: 0.7rem; flex-shrink: 0; margin-top: 0.2rem;
+    }
+    .dev-item::before {
+      content: '◦';
+      color: var(--magenta-600); font-size: 0.9rem; flex-shrink: 0; margin-top: 0.1rem;
+    }
+
+    /* ════════════════════════════════════════
+       CONTEXTO LABORAL
+    ════════════════════════════════════════ */
+    .contexto-section { margin-bottom: 3rem; }
+    .contexto-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 640px) { .contexto-grid { grid-template-columns: 1fr; } }
+    .contexto-texto {
+      font-size: 0.875rem; line-height: 1.8; color: rgba(255,255,255,0.75);
+    }
+
+    /* Crecimiento full-width */
+    .crecimiento-card {
+      background: linear-gradient(135deg, rgba(40,6,64,0.8) 0%, rgba(110,62,171,0.2) 100%);
+      border: 1px solid rgba(226,184,8,0.2);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .crecimiento-card .card-title { color: var(--gold-500); }
+    .crecimiento-texto {
+      font-size: 0.9rem; line-height: 1.85; color: rgba(255,255,255,0.8);
+    }
+
+    /* ════════════════════════════════════════
+       ALAS
+    ════════════════════════════════════════ */
+    .alas-section { margin-bottom: 3rem; }
+    .alas-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    }
+    @media (max-width: 540px) { .alas-grid { grid-template-columns: 1fr; } }
+
+    .ala-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .ala-card.ala-dominante {
+      border-color: rgba(226,184,8,0.5);
+      background: rgba(226,184,8,0.04);
+    }
+    .ala-dominante-badge {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      padding: 0.2rem 0.6rem; border-radius: 100px;
+      background: rgba(226,184,8,0.15); border: 1px solid rgba(226,184,8,0.4);
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--gold-500);
+      display: none;
+    }
+    .ala-card.ala-dominante .ala-dominante-badge { display: block; }
+
+    .ala-num {
+      font-size: 3rem; font-weight: 900; line-height: 1;
+      color: var(--violet-600); margin-bottom: 0.25rem;
+    }
+    .ala-nombre { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+    .ala-score-row {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .ala-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px; }
+    .ala-bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--violet-600), var(--magenta-600));
+    }
+    .ala-pct { font-size: 0.8rem; font-weight: 700; color: var(--gray-400); }
+
+    .ala-dominante-text {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      margin-top: 1rem;
+    }
+
+    /* ════════════════════════════════════════
+       FLECHAS / INTEGRACIÓN
+    ════════════════════════════════════════ */
+    .flechas-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem;
+    }
+    @media (max-width: 600px) { .flechas-grid { grid-template-columns: 1fr; } }
+
+    .flecha-card {
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .flecha-int {
+      background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(16,185,129,0.02) 100%);
+      border: 1px solid rgba(16,185,129,0.25);
+    }
+    .flecha-des {
+      background: linear-gradient(135deg, rgba(149,58,144,0.1) 0%, rgba(149,58,144,0.02) 100%);
+      border: 1px solid rgba(149,58,144,0.25);
+    }
+    .flecha-header {
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .flecha-icon { font-size: 1.4rem; }
+    .flecha-tipo-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+    .flecha-int .flecha-tipo-label { color: #10b981; }
+    .flecha-des .flecha-tipo-label { color: var(--magenta-600); }
+    .flecha-num { font-size: 2rem; font-weight: 900; line-height: 1; }
+    .flecha-int .flecha-num { color: #10b981; }
+    .flecha-des .flecha-num { color: var(--magenta-600); }
+    .flecha-nombre { font-size: 0.9rem; font-weight: 600; color: var(--white); margin-bottom: 0.75rem; }
+    .flecha-desc { font-size: 0.82rem; line-height: 1.65; color: rgba(255,255,255,0.7); }
+
+    /* ════════════════════════════════════════
+       NIVELES DE SALUD
+    ════════════════════════════════════════ */
+    .niveles-section { margin-bottom: 3rem; }
+    .niveles-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+    }
+    @media (max-width: 640px) { .niveles-grid { grid-template-columns: 1fr; } }
+
+    .nivel-card {
+      border-radius: var(--radius-sm); padding: 1.25rem;
+      border: 1px solid;
+    }
+    .nivel-sano {
+      background: rgba(16,185,129,0.06);
+      border-color: rgba(16,185,129,0.2);
+    }
+    .nivel-promedio {
+      background: rgba(226,184,8,0.06);
+      border-color: rgba(226,184,8,0.2);
+    }
+    .nivel-insano {
+      background: rgba(149,58,144,0.06);
+      border-color: rgba(149,58,144,0.2);
+    }
+    .nivel-badge {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 0.6rem; display: block;
+    }
+    .nivel-sano .nivel-badge { color: #10b981; }
+    .nivel-promedio .nivel-badge { color: var(--gold-500); }
+    .nivel-insano .nivel-badge { color: var(--magenta-600); }
+    .nivel-desc { font-size: 0.82rem; line-height: 1.6; color: rgba(255,255,255,0.75); }
+
+    /* ════════════════════════════════════════
+       GRÁFICO DE BARRAS
+    ════════════════════════════════════════ */
+    .bars-section { margin-bottom: 3rem; }
+    .bars-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+
+    /* ════════════════════════════════════════
+       TABLA DE SCORES
+    ════════════════════════════════════════ */
+    .scores-section { margin-bottom: 3rem; }
+    .scores-table-wrap {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .scores-table-inner {
+      width: 100%; border-collapse: collapse;
+    }
+    .scores-table-inner thead tr {
+      background: rgba(110,62,171,0.15);
+    }
+    .scores-table-inner th {
+      padding: 0.8rem 1rem;
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gray-400); text-align: left;
+    }
+    .scores-table-inner td { padding: 0.7rem 1rem; }
+    .scores-table-inner tr + tr { border-top: 1px solid rgba(255,255,255,0.04); }
+    .row-base { background: rgba(226,184,8,0.06); }
+    .row-ala  { background: rgba(110,62,171,0.06); }
+
+    .td-num { font-size: 1.1rem; font-weight: 900; color: var(--violet-600); width: 40px; }
+    .row-base .td-num { color: var(--gold-500); }
+    .td-name { font-size: 0.85rem; font-weight: 500; color: var(--white); }
+    .td-tag { width: 100px; }
+    .tag-base, .tag-ala {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 100px;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .tag-base { background: rgba(226,184,8,0.15); color: var(--gold-500); border: 1px solid rgba(226,184,8,0.35); }
+    .tag-ala  { background: rgba(110,62,171,0.15); color: #c4a0f8; border: 1px solid rgba(110,62,171,0.35); }
+    .td-score { width: 160px; }
+    .score-mini-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 99px; margin-bottom: 0.3rem; }
+    .score-mini-fill { height: 100%; border-radius: 99px; }
+    .score-val { font-size: 0.78rem; font-weight: 700; color: var(--gray-400); }
+    .row-base .score-val { color: var(--gold-500); }
+
+    /* ════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════ */
+    .report-footer {
+      border-top: 1px solid rgba(110,62,171,0.2);
+      padding-top: 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-brand { font-size: 0.75rem; color: var(--gray-400); }
+    .footer-brand strong { color: var(--violet-600); }
+    .footer-legal { font-size: 0.68rem; color: rgba(255,255,255,0.3); max-width: 400px; text-align: right; line-height: 1.5; }
+
+    /* ════════════════════════════════════════
+       BOTONES FLOTANTES
+    ════════════════════════════════════════ */
+.floating-btns {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: flex-end;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(110, 62, 171, 0.5);
+  color: var(--white);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 100px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  
+  /* Corrección para compatibilidad con Safari */
+  -webkit-backdrop-filter: blur(8px); 
+  backdrop-filter: blur(8px);
+}
+    .btn-back:hover { background: rgba(110,62,171,0.2); color: var(--white); }
+    .btn-pdf {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      background: linear-gradient(135deg, var(--gold-700) 0%, var(--gold-500) 100%);
+      color: var(--ink-900);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      border: none; border-radius: 100px; cursor: pointer;
+      box-shadow: 0 8px 32px rgba(226,184,8,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-pdf:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(226,184,8,0.45); }
+    .btn-pdf:active { transform: translateY(0); }
+    .btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ── Logos header ── */
+    .logo-one { height: 36px; width: auto; object-fit: contain; }
+    .brand-divider { width: 1px; height: 32px; background: rgba(110,62,171,0.35); }
+
+    /* ── Logos footer ── */
+    .footer-logos {
+      display: flex; align-items: center; gap: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+    .footer-logo-one     { height: 28px; width: auto; object-fit: contain; opacity: 0.85; }
+    .footer-logo-escencial { height: 22px; width: auto; object-fit: contain; opacity: 0.7; }
+
+    /* ── Print ── */
+    @media print {
+      body::before { display: none; }
+      .floating-btns { display: none; }
+      #report { display: block !important; opacity: 1 !important; }
+      #loader { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Loader ── -->
+  <div id="loader">
+    <div class="loader-ring"></div>
+    <span class="loader-text">Procesando tu perfil de Eneagrama...</span>
+  </div>
+
+  <!-- ── Botones flotantes ── -->
+  <div class="floating-btns">
+    <a class="btn-back" href="../Userboard/index.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Volver
+    </a>
+    <button class="btn-pdf" id="btn-generar-pdf">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Descargar PDF
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       INFORME
+  ══════════════════════════════════════════ -->
+  <div id="report">
+
+    <!-- ── HEADER ── -->
+    <header class="report-header">
+      <div class="brand-logo">
+        <img src="../img/one-logocolor.png" alt="ONE Platform" class="logo-one" />
+        <div class="brand-divider"></div>
+        <div>
+          <div class="brand-name">ENEAGRAMA</div>
+          <div class="brand-sub">Informe de Personalidad</div>
+        </div>
+      </div>
+      <div class="header-meta">
+        <div class="user-fullname" id="user-name-2">—</div>
+        <div class="user-info" id="user-email">—</div>
+        <div class="user-info" id="user-date">—</div>
+      </div>
+    </header>
+
+    <!-- ── HERO TIPO ── -->
+    <section class="hero-tipo">
+      <div class="hero-left">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Evaluación Completada · ONE Platform
+        </div>
+
+        <div class="tipo-numero-display" id="tipo-numero">—</div>
+
+        <div class="tipo-nombre-display" id="tipo-nombre">—</div>
+        <div class="tipo-subtitulo-display" id="tipo-subtitulo">—</div>
+
+        <div class="tipo-badges">
+          <span class="badge badge-gold">
+            <span id="tipo-icono">—</span>
+            <span id="tipo-nombre-badge"></span>
+          </span>
+          <span class="badge badge-violet">Pecado: <span id="tipo-pecado">—</span></span>
+          <span class="badge badge-magenta">Virtud: <span id="tipo-virtud">—</span></span>
+        </div>
+
+        <p class="tipo-descripcion-hero" id="tipo-descripcion">—</p>
+
+        <div class="score-display">
+          <span class="score-label">SCORE BASE</span>
+          <div class="score-bar">
+            <div class="score-bar-fill" id="score-bar-fill"></div>
+          </div>
+          <span class="score-pct" id="score-valor">—</span>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="wheel-container" id="eneagrama-wheel"></div>
+      </div>
+    </section>
+
+    <!-- ── TRÍADA CORE ── -->
+    <div class="section-label">
+      <span class="section-label-text">Núcleo del Tipo</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="triada-grid">
+      <div class="triada-card">
+        <div class="triada-icon">🎯</div>
+        <div class="triada-label">Motivación profunda</div>
+        <div class="triada-value" id="tipo-motivacion">—</div>
+      </div>
+      <div class="triada-card">
+        <div class="triada-icon">⚠️</div>
+        <div class="triada-label">Miedo fundamental</div>
+        <div class="triada-value" id="tipo-miedo">—</div>
+      </div>
+      <div class="triada-card">
+        <div class="triada-icon">💎</div>
+        <div class="triada-label">Deseo básico</div>
+        <div class="triada-value" id="tipo-deseo">—</div>
+      </div>
+    </div>
+
+    <!-- ── FORTALEZAS / DESARROLLO ── -->
+    <div class="section-label">
+      <span class="section-label-text">Perfil de Competencias</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="two-col" style="margin-bottom:3rem">
+      <div class="card">
+        <div class="card-title">Fortalezas Naturales</div>
+        <ul id="lista-fortalezas"></ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Áreas de Desarrollo</div>
+        <ul id="lista-desarrollo"></ul>
+      </div>
+    </div>
+
+    <!-- ── CONTEXTO LABORAL ── -->
+    <div class="section-label">
+      <span class="section-label-text">Contexto Organizacional</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="contexto-section">
+      <div class="contexto-grid">
+        <div class="card">
+          <div class="card-title">En el Trabajo</div>
+          <p class="contexto-texto" id="tipo-trabajo">—</p>
+        </div>
+        <div class="card">
+          <div class="card-title">En el Equipo</div>
+          <p class="contexto-texto" id="tipo-equipo">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CRECIMIENTO ── -->
+    <div class="crecimiento-card">
+      <div class="card-title">✦ Camino de Crecimiento</div>
+      <p class="crecimiento-texto" id="tipo-crecimiento">—</p>
+    </div>
+
+    <!-- ── ALAS ── -->
+    <div class="section-label">
+      <span class="section-label-text">Alas — Influencias Adyacentes</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="alas-section">
+      <div class="alas-grid">
+        <div class="ala-card" id="ala1-card">
+          <span class="ala-dominante-badge">Dominante</span>
+          <div class="ala-num" id="ala1-numero">—</div>
+          <div class="ala-nombre" id="ala1-nombre">—</div>
+          <div class="ala-score-row">
+            <div class="ala-bar">
+              <div class="ala-bar-fill" id="ala1-bar-fill"></div>
+            </div>
+            <span class="ala-pct" id="ala1-score">—</span>
+          </div>
+        </div>
+        <div class="ala-card" id="ala2-card">
+          <span class="ala-dominante-badge">Dominante</span>
+          <div class="ala-num" id="ala2-numero">—</div>
+          <div class="ala-nombre" id="ala2-nombre">—</div>
+          <div class="ala-score-row">
+            <div class="ala-bar">
+              <div class="ala-bar-fill" id="ala2-bar-fill"></div>
+            </div>
+            <span class="ala-pct" id="ala2-score">—</span>
+          </div>
+        </div>
+      </div>
+      <p class="ala-dominante-text" id="ala-dominante-label"></p>
+    </div>
+
+    <!-- ── FLECHAS ── -->
+    <div class="section-label">
+      <span class="section-label-text">Líneas de Integración y Desintegración</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="flechas-grid">
+      <div class="flecha-card flecha-int">
+        <div class="flecha-header">
+          <span class="flecha-icon">↗</span>
+          <div>
+            <div class="flecha-tipo-label">Dirección de Integración · Crecimiento</div>
+            <div class="flecha-num" id="int-numero">—</div>
+          </div>
+        </div>
+        <div class="flecha-nombre" id="int-nombre">—</div>
+        <p class="flecha-desc" id="int-desc">—</p>
+      </div>
+      <div class="flecha-card flecha-des">
+        <div class="flecha-header">
+          <span class="flecha-icon">↘</span>
+          <div>
+            <div class="flecha-tipo-label">Dirección de Desintegración · Estrés</div>
+            <div class="flecha-num" id="des-numero">—</div>
+          </div>
+        </div>
+        <div class="flecha-nombre" id="des-nombre">—</div>
+        <p class="flecha-desc" id="des-desc">—</p>
+      </div>
+    </div>
+
+    <!-- ── NIVELES DE SALUD ── -->
+    <div class="section-label">
+      <span class="section-label-text">Niveles de Salud Psicológica</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="niveles-section">
+      <div class="niveles-grid">
+        <div class="nivel-card nivel-sano">
+          <span class="nivel-badge">Nivel Sano</span>
+          <p class="nivel-desc" id="nivel-sano">—</p>
+        </div>
+        <div class="nivel-card nivel-promedio">
+          <span class="nivel-badge">Nivel Promedio</span>
+          <p class="nivel-desc" id="nivel-promedio">—</p>
+        </div>
+        <div class="nivel-card nivel-insano">
+          <span class="nivel-badge">Nivel Insano</span>
+          <p class="nivel-desc" id="nivel-insano">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GRÁFICO BARRAS ── -->
+    <div class="section-label">
+      <span class="section-label-text">Distribución de Scores — Los 9 Tipos</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="bars-section">
+      <div class="bars-card">
+        <div class="card-title" style="margin-bottom:1.5rem">Perfil Completo de Eneagrama</div>
+        <div id="eneagrama-bars"></div>
+      </div>
+    </div>
+
+    <!-- ── TABLA SCORES ── -->
+    <div class="section-label">
+      <span class="section-label-text">Ranking de Tipos · Puntajes Detallados</span>
+      <div class="section-label-line"></div>
+    </div>
+
+    <div class="scores-section">
+      <div class="scores-table-wrap">
+        <table class="scores-table-inner">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tipo</th>
+              <th>Rol</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="scores-table"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── FOOTER ── -->
+<footer class="report-footer">
+  <div class="footer-logos">
+    <img src="../img/one-logocolor.png" alt="ONE Platform" class="footer-logo-one" />
+    
+    <img src="../img/escencial-logoblanco.png" 
+         alt="Escencial Consultora" 
+         class="footer-logo-escencial" 
+         style="height: 45px; width: auto; transform: scale(1.4); margin-left: 15px;" />
+  </div>
+  
+  <div class="footer-brand">
+    Generado por <strong>ONE Platform</strong> · Escencial<br>
+    Evaluado: <span id="user-name">—</span>
+  </div>
+  
+  <div class="footer-legal">
+    Este informe es de carácter confidencial y está basado en el modelo del Eneagrama de la Personalidad.
+    Los resultados son orientativos y deben interpretarse en contexto. No constituyen un diagnóstico clínico.
+  </div>
+</footer>
+  </div><!-- /#report -->
+
+  <!-- ── jsPDF (para generación de PDF) ── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- ── Calculo unificado (fuente unica de verdad para toda la plataforma) ── -->
+  <script src="calculoEneagramaTotal.js"></script>
+
+  <!-- ── Scripts ── -->
+  <script src="eneagramaCalc.js"></script>
+  <script src="eneagramaData.js"></script>
+  <script src="eneagramaWheel.js"></script>
+  <script src="eneagramaBarChart.js"></script>
+  <script src="script.js"></script>
+
+  <!-- ── Manual PDF ── -->
+  <script src="../Manual/EneagramaTheme.js"></script>
+  <script src="../Manual/EneagramaManual.js"></script>
+
+  <!-- ── PDF Generator (ES Module) ── -->
+  <script type="module" src="pdfGenerator/main.js"></script>
+
+  <script>
+    // Llenar barra de alas después que script.js corra
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        const ala1Bar = document.getElementById('ala1-bar-fill');
+        const ala2Bar = document.getElementById('ala2-bar-fill');
+        const ala1Score = document.getElementById('ala1-score');
+        const ala2Score = document.getElementById('ala2-score');
+        if (ala1Bar && ala1Score) {
+          const pct = ala1Score.textContent.replace('%', '');
+          ala1Bar.style.width = pct + '%';
+          ala1Bar.style.transition = 'width 1.2s cubic-bezier(0.4,0,0.2,1) 0.5s';
+        }
+        if (ala2Bar && ala2Score) {
+          const pct = ala2Score.textContent.replace('%', '');
+          ala2Bar.style.width = pct + '%';
+          ala2Bar.style.transition = 'width 1.2s cubic-bezier(0.4,0,0.2,1) 0.7s';
+        }
+      }, 500);
+    });
+  </script>
+
+</body>
+</html>

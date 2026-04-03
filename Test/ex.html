@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eneagrama Profesional - Escencial</title>
+    <link rel="icon" type="image/png" href="./img/favicon.png" sizes="32x32">
+    <link rel="shortcut icon" href="./img/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="./img/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh; padding: 24px;
+            background-image: url('./img/one-fondograndecolor.jpg');
+            background-position: center; background-repeat: no-repeat;
+            background-size: cover; background-attachment: fixed;
+        }
+        .container {
+            max-width: 800px; margin: 0 auto;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+            padding: 48px; position: relative;
+        }
+        .logo { position: absolute; top: 24px; left: 24px; height: 64px; width: auto; }
+        h1 {
+            color: #020f27; font-size: 32px; font-weight: 700;
+            margin-bottom: 12px; text-align: center;
+            letter-spacing: -0.5px; margin-top: 56px;
+        }
+        .subtitle { color: #64748b; text-align: center; margin-bottom: 40px; font-size: 16px; line-height: 1.6; }
+        .form-group { margin-bottom: 28px; }
+        label { display: block; color: #334155; font-weight: 600; margin-bottom: 10px; text-align: center; font-size: 15px; }
+        input[type="text"], input[type="email"] {
+            width: 100%; padding: 16px 20px; border: 2px solid #e2e8f0;
+            border-radius: 12px; font-size: 16px; transition: all 0.3s ease;
+            background: white; text-align: center;
+        }
+        input[type="text"]:focus, input[type="email"]:focus {
+            outline: none; border-color: #0b4a6e;
+            box-shadow: 0 0 0 4px rgba(11,74,110,0.1); transform: translateY(-2px);
+        }
+        input::placeholder { color: #94a3b8; }
+        .header { text-align: center; margin-bottom: 32px; }
+        .page-info { color: #64748b; font-size: 16px; margin-bottom: 12px; font-weight: 500; }
+        .progress-percent { color: #64748b; font-size: 16px; font-weight: 600; position: absolute; right: 48px; top: 48px; }
+        .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 32px; }
+        .progress-fill { height: 100%; background: #1e3a5f; transition: width 0.4s ease; border-radius: 10px; }
+        .questions-container { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+        .question-card {
+            background: white; padding: 24px 32px; border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex; justify-content: space-between; align-items: center; gap: 24px;
+        }
+        .question-text { font-size: 16px; color: #1e293b; font-weight: 500; flex: 1; }
+        .scale-options { display: flex; gap: 12px; flex-shrink: 0; }
+        .scale-option { position: relative; }
+        .scale-option input[type="radio"] { display: none; }
+        .scale-option label {
+            display: flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px; background: white; border: 2px solid #cbd5e1;
+            border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+            font-size: 18px; font-weight: 600; color: #64748b;
+        }
+        .scale-option input[type="radio"]:checked + label { background: #6b7c52; color: white; border-color: #6b7c52; transform: scale(1.05); }
+        .scale-option label:hover { border-color: #6b7c52; transform: scale(1.05); }
+        .navigation { display: flex; gap: 16px; justify-content: center; }
+        .btn { padding: 14px 40px; border: none; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-secondary { background: white; color: #475569; border: 2px solid #cbd5e1; }
+        .btn-secondary:hover:not(:disabled) { border-color: #94a3b8; transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(135deg, #0b4a6e 0%, #020f27 100%); color: white; box-shadow: 0 4px 15px rgba(11,74,110,0.3); }
+        .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,74,110,0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .result-screen { padding-top: 40px; }
+        .confirmation-card {
+            text-align: center; padding: 48px 32px;
+            background: white; border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            max-width: 560px; margin: 0 auto;
+        }
+        .confirmation-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: white; margin: 0 auto 24px;
+            line-height: 72px;
+        }
+        .confirmation-title {
+            font-size: 28px; font-weight: 700; color: #020f27;
+            margin-bottom: 8px; background: none;
+            -webkit-text-fill-color: #020f27;
+        }
+        .confirmation-sub {
+            color: #64748b; font-size: 16px; margin-bottom: 28px;
+        }
+        .confirmation-info {
+            background: #f1f5f9; border-radius: 12px;
+            padding: 20px 24px; text-align: left; margin-bottom: 8px;
+        }
+        .confirmation-info p {
+            color: #334155; font-size: 15px; line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        .confirmation-info p:last-child { margin-bottom: 0; }
+        .confirmation-note {
+            color: #94a3b8 !important; font-size: 13px !important;
+        }
+        .result-screen h1 { font-size: 48px; margin-bottom: 24px; background: linear-gradient(135deg, #0b4a6e 0%, #020f27 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .result-description { color: #475569; font-size: 18px; line-height: 1.8; margin-bottom: 32px; text-align: center; }
+        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+        .chart-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .chart-card h3 { color: #020f27; margin-bottom: 20px; font-size: 20px; text-align: center; }
+        .distribution-bars { display: flex; flex-direction: column; gap: 16px; }
+        .bar-item { display: flex; flex-direction: column; gap: 8px; }
+        .bar-header { display: flex; justify-content: space-between; align-items: center; }
+        .bar-label { color: #334155; font-weight: 600; font-size: 14px; }
+        .bar-percent { color: #64748b; font-weight: 600; font-size: 14px; }
+        .bar-background { width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(135deg, #0b4a6e 0%, #020f27 100%); width: 0; transition: width 1s ease; border-radius: 6px; }
+        .success-msg { background: #10b981; color: white; padding: 16px; border-radius: 12px; text-align: center; margin-bottom: 24px; font-weight: 600; }
+        .hidden { display: none !important; }
+        @media (max-width: 768px) {
+            .container { padding: 32px 24px; }
+            h1 { font-size: 24px; }
+            .question-card { flex-direction: column; align-items: flex-start; }
+            .scale-options { width: 100%; justify-content: space-between; }
+            .scale-option label { width: 40px; height: 40px; font-size: 16px; }
+            .charts-container { grid-template-columns: 1fr; }
+            .progress-percent { position: static; margin-bottom: 12px; }
+        }
+
+        .scale-legend {
+    margin: 20px 0 28px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(11,74,110,0.06) 0%, rgba(2,15,39,0.04) 100%);
+    border: 1px solid rgba(11,74,110,0.12);
+    border-radius: 14px;
+}
+
+.scale-legend-title {
+    color: #0b4a6e;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.scale-legend-items {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.scale-legend-items span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 62px;
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.35;
+    color: #334155;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #dbe4ea;
+    border-radius: 10px;
+}
+
+.scale-legend-items strong {
+    color: #0b4a6e;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+@media (max-width: 768px) {
+    .scale-legend-items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .scale-legend-items span:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="./img/one-logocolor.png" alt="Logo ONE" class="logo">
+
+<div id="registrationScreen">
+    <h1>Test de Eneagrama Profesional</h1>
+    <p class="subtitle">Descubre tu tipo de personalidad y potencia tu desarrollo profesional</p>
+
+    <div class="scale-legend" aria-label="Referencia de escala de respuestas">
+        <div class="scale-legend-title">Escala de respuesta</div>
+        <div class="scale-legend-items">
+            <span><strong>1</strong> = Nunca</span>
+            <span><strong>2</strong> = Rara vez</span>
+            <span><strong>3</strong> = A veces</span>
+            <span><strong>4</strong> = Frecuentemente</span>
+            <span><strong>5</strong> = Siempre</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="userName">Nombre</label>
+        <input type="text" id="userName" placeholder="Ingresa tu nombre">
+    </div>
+    <div class="form-group">
+        <label for="userLastName">Apellido</label>
+        <input type="text" id="userLastName" placeholder="Ingresa tu apellido">
+    </div>
+    <div class="form-group">
+        <label for="userEmail">Correo Electronico</label>
+        <input type="email" id="userEmail" placeholder="tucorreo@ejemplo.com">
+    </div>
+    <div class="navigation">
+        <button class="btn btn-primary" id="startBtn">Comenzar Test</button>
+    </div>
+</div>
+
+    <div id="testScreen" class="hidden">
+        <div class="progress-percent" id="progressPercent">0%</div>
+        <div class="header">
+            <div class="page-info" id="pageInfo">Pagina 1 de 9</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        <div class="questions-container" id="questionsContainer"></div>
+        <div class="navigation">
+            <button class="btn btn-secondary" id="prevBtn" style="display:none">Anterior</button>
+            <button class="btn btn-primary" id="nextBtn" disabled>Siguiente</button>
+        </div>
+    </div>
+
+    <div id="resultScreen" class="result-screen hidden">
+        <div class="confirmation-card">
+            <div class="confirmation-icon">&#10003;</div>
+            <h1 class="confirmation-title">Evaluacion completada</h1>
+            <p class="confirmation-sub">Tus respuestas fueron enviadas correctamente.</p>
+            <div class="confirmation-info">
+                <p>Podras ver tu informe completo y descargar tu material personalizado
+                desde la seccion <strong>Mi Panel &rarr; Informe</strong>.</p>
+                <p class="confirmation-note">El analisis de tu perfil Eneagramatico
+                estara disponible en unos instantes.</p>
+            </div>
+            <div class="navigation" style="margin-top:32px;">
+                <button class="btn btn-secondary" id="restartBtn">Realizar Nuevo Test</button>
+                <button class="btn btn-primary" id="backPanelBtn">Ir al Panel &#8594;</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="ruedaExport" style="position:fixed;left:-10000px;top:-10000px;width:800px;height:800px;overflow:hidden;"></div>
+<script>
+(function() {
+
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTG4ijRmyn_RdN88lGAudFiXF0_8A78GukRfvCCncO5S7G5wLe938iqveW4EMG1ZAS/exec';
+var PAGE_LABELS = ['PI','PII','PIII','PIV','PV','PVI','PVII','PVIII','PIX','PX','PXI','PXII'];
+
+var TYPE_NAMES = [null,
+    'Tipo 1: El Reformador','Tipo 2: El Ayudador','Tipo 3: El Triunfador',
+    'Tipo 4: El Individualista','Tipo 5: El Investigador','Tipo 6: El Leal',
+    'Tipo 7: El Entusiasta','Tipo 8: El Desafiante','Tipo 9: El Pacificador'
+];
+
+var DESCRIPTIONS = [null,
+    'Perfeccionista, etico y organizado. Busca mejorar el mundo.',
+    'Generoso, empatico y servicial. Se enfoca en ayudar a otros.',
+    'Ambicioso, adaptable y orientado al exito. Busca logros.',
+    'Creativo, autentico y sensible. Valora la individualidad.',
+    'Analitico, observador y reservado. Busca conocimiento.',
+    'Leal, responsable y cauteloso. Valora la seguridad.',
+    'Entusiasta, optimista y versatil. Busca nuevas experiencias.',
+    'Fuerte, directo y protector. Busca el control.',
+    'Pacifico, receptivo y mediador. Evita conflictos.'
+];
+
+var QUESTIONS = [
+    {t:"Con que frecuencia sientes la necesidad de corregir errores o mejorar las cosas a tu alrededor, incluso cuando nadie te lo ha pedido?", ty:1},
+    {t:"Tiendes a anticipar las necesidades de los demas antes de que te las expresen, sintiendo satisfaccion al ayudarlos?", ty:2},
+    {t:"Cuan importante es para ti proyectar una imagen de exito y logro en tu entorno profesional y social?", ty:3},
+    {t:"Sientes que hay algo unico y diferente en ti que te distingue de las demas personas?", ty:4},
+    {t:"Prefieres observar y analizar las situaciones antes de participar activamente en ellas?", ty:5},
+    {t:"Te encuentras frecuentemente anticipando posibles problemas o escenarios negativos antes de tomar decisiones?", ty:6},
+    {t:"Sueles tener multiples planes e ideas emocionantes, sintiendo inquietud cuando la rutina se vuelve monotona?", ty:7},
+    {t:"Te resulta natural tomar el control de las situaciones y defender tus puntos de vista con firmeza?", ty:8},
+    {t:"Prefieres mantener la armonia y evitar conflictos, incluso si eso significa postergar tus propias necesidades?", ty:9},
+    {t:"Te resulta dificil relajarte cuando sabes que hay tareas pendientes o cosas que podrian hacerse mejor?", ty:1},
+    {t:"Sientes incomodidad o frustracion cuando tus esfuerzos por ayudar a otros no son reconocidos o valorados?", ty:2},
+    {t:"Adaptas tu comportamiento o presentacion segun el contexto para causar una mejor impresion?", ty:3},
+    {t:"Experimentas emociones intensas que parecen mas profundas que las de quienes te rodean?", ty:4},
+    {t:"Necesitas tiempo a solas para recargar energias despues de interacciones sociales prolongadas?", ty:5},
+    {t:"Buscas constantemente respaldo o confirmacion antes de comprometerte con decisiones importantes?", ty:6},
+    {t:"Te cuesta permanecer enfocado en una sola actividad cuando surgen nuevas oportunidades interesantes?", ty:7},
+    {t:"Valoras la honestidad directa y te incomoda cuando las personas son evasivas o indecisas?", ty:8},
+    {t:"Te cuesta expresar tus opiniones cuando difieren de las del grupo o podrian generar tension?", ty:9},
+    {t:"Tienes un critico interno que constantemente evalua si estas haciendo las cosas de manera correcta?", ty:1},
+    {t:"Te sientes mas valorado cuando estas siendo util o indispensable para alguien?", ty:2},
+    {t:"Mides tu autoestima en funcion de tus logros y el reconocimiento que recibes?", ty:3},
+    {t:"Sientes nostalgia por experiencias o conexiones que parecen mas autenticas o significativas que tu realidad actual?", ty:4},
+    {t:"Prefieres acumular conocimiento y recursos antes de actuar, para sentirte preparado?", ty:5},
+    {t:"Cuestionas las intenciones de los demas hasta que demuestran ser confiables?", ty:6},
+    {t:"Evitas conscientemente situaciones o emociones que puedan resultar dolorosas o limitantes?", ty:7},
+    {t:"Sientes la necesidad de proteger a quienes percibes como vulnerables o en desventaja?", ty:8},
+    {t:"Postergas la toma de decisiones importantes o te distraes con tareas menos relevantes?", ty:9},
+    {t:"Sientes resentimiento cuando otros no cumplen con los mismos estandares de responsabilidad que tu mantienes?", ty:1},
+    {t:"Te resulta mas facil identificar las necesidades ajenas que reconocer las tuyas propias?", ty:2},
+    {t:"Te sientes incomodo con el fracaso al punto de evitar situaciones donde podrias no destacar?", ty:3},
+    {t:"Sientes que algo esencial falta en tu vida, incluso cuando las cosas van objetivamente bien?", ty:4},
+    {t:"Te resulta agotador cuando otros demandan demasiado de tu tiempo o energia emocional?", ty:5},
+    {t:"Alternas entre buscar autoridad y cuestionarla, dependiendo del contexto?", ty:6},
+    {t:"Mantienes multiples opciones abiertas porque comprometerte con una sola te genera ansiedad?", ty:7},
+    {t:"Te resulta dificil mostrar vulnerabilidad, prefiriendo proyectar fortaleza en todo momento?", ty:8},
+    {t:"Adoptas las opiniones o preferencias de otros para mantener la paz, aunque no coincidan con las tuyas?", ty:9},
+    {t:"Experimentas frustracion cuando las reglas o procedimientos no se siguen adecuadamente?", ty:1},
+    {t:"Sientes que das mas en las relaciones de lo que recibes, pero te cuesta expresarlo directamente?", ty:2},
+    {t:"Te enfocas intensamente en tus metas, a veces descuidando tu bienestar emocional o relaciones personales?", ty:3},
+    {t:"Tiendes a idealizar lo que no tienes mientras desvalorizas lo que esta presente en tu vida?", ty:4},
+    {t:"Prefieres comunicarte por escrito o con tiempo de preparacion en lugar de conversaciones espontaneas?", ty:5},
+    {t:"Tiendes a planificar exhaustivamente para minimizar riesgos e imprevistos?", ty:6},
+    {t:"Reencuadras las experiencias negativas buscando el lado positivo rapidamente?", ty:7},
+    {t:"Prefieres el conflicto directo a la tension no resuelta o la comunicacion pasivo-agresiva?", ty:8},
+    {t:"Te fusionas con las agendas de otros, perdiendo contacto con tus propias prioridades y deseos?", ty:9},
+    {t:"Sientes que hay una forma correcta de hacer las cosas y te frustras cuando no se respeta?", ty:1},
+    {t:"Modificas tu comportamiento para ser querido o aceptado por las personas importantes en tu vida?", ty:2},
+    {t:"Te resulta dificil desconectar del trabajo o pausar tu busqueda de objetivos para simplemente estar?", ty:3},
+    {t:"Sientes atraccion por la belleza, el arte o experiencias que expresan profundidad emocional?", ty:4},
+    {t:"Estableces limites claros en tu vida para proteger tu espacio personal y privacidad?", ty:5},
+    {t:"Te cuesta confiar en tu propio juicio, buscando validacion externa frecuentemente?", ty:6},
+    {t:"Prefieres mantener las conversaciones ligeras y optimistas, evitando temas pesados o dolorosos?", ty:7},
+    {t:"Tienes poca paciencia con la debilidad o la victimizacion, tanto en ti como en otros?", ty:8},
+    {t:"Encuentras dificil identificar que es realmente importante para ti entre todas las demandas externas?", ty:9},
+    {t:"Cuando terminas una tarea, sueles revisarla varias veces para asegurarte de que no haya errores?", ty:1},
+    {t:"Tiendes a intuir cuando alguien necesita ayuda antes de que te lo pidan y actuar de inmediato?", ty:2},
+    {t:"Te comparas frecuentemente con otros en terminos de logros o exito para medir tu progreso?", ty:3},
+    {t:"Sientes que pocas personas realmente comprenden la profundidad de tus experiencias internas?", ty:4},
+    {t:"Prefieres entender completamente un tema antes de compartir tu opinion o involucrarte?", ty:5},
+    {t:"Antes de tomar una decision importante, necesitas consultar con personas de confianza para validarla?", ty:6},
+    {t:"Cuando enfrentas situaciones dificiles, tu primer impulso es buscar algo positivo o una nueva salida?", ty:7},
+    {t:"Cuando alguien es injusto o deshonesto, tiendes a confrontarlo directamente sin rodeos?", ty:8},
+    {t:"Cuando hay tension entre personas cercanas, sientes la necesidad de mediar y restaurar la armonia?", ty:9},
+    {t:"Sientes tension interna cuando alguien hace algo de manera incorrecta o ineficiente frente a ti?", ty:1},
+    {t:"Te cuesta decir que no cuando alguien te pide un favor, incluso cuando no tenes tiempo o energia?", ty:2},
+    {t:"Tiendes a presentar la mejor version posible de ti mismo en situaciones sociales o profesionales?", ty:3},
+    {t:"A veces te quedas atrapado en emociones dificiles mas tiempo del que considerarias razonable?", ty:4},
+    {t:"Tiendes a retirarte emocionalmente cuando las situaciones se vuelven muy intensas o demandantes?", ty:5},
+    {t:"Tiendes a imaginar lo que podria salir mal en una situacion incluso cuando todo parece estar bien?", ty:6},
+    {t:"Te aburres rapidamente de las rutinas y buscas activamente nuevas experiencias o proyectos?", ty:7},
+    {t:"Te incomoda profundamente depender de otros o necesitar apoyo externo para lograr tus objetivos?", ty:8},
+    {t:"A veces te das cuenta de que perdiste de vista tus propias necesidades por enfocarte en las de otros?", ty:9},
+    {t:"Te resulta dificil disfrutar el tiempo libre cuando sientes que podrias estar siendo mas productivo?", ty:1},
+    {t:"Tu bienestar emocional depende en gran parte de que las personas cercanas esten bien?", ty:2},
+    {t:"Te resulta dificil descansar genuinamente cuando sientes que otros avanzan mas rapido que tu?", ty:3},
+    {t:"Buscas crear experiencias que reflejen autenticamente quien sos sin importar la opinion ajena?", ty:4},
+    {t:"Valoras tu independencia y autonomia por encima de la conexion social frecuente?", ty:5},
+    {t:"La lealtad y la confianza son valores que defines como absolutamente no negociables para ti?", ty:6},
+    {t:"Te resulta dificil comprometerte con una sola opcion cuando hay muchas posibilidades disponibles?", ty:7},
+    {t:"En situaciones de conflicto, tiendes a intensificar la confrontacion antes que buscar una salida?", ty:8},
+    {t:"Te resulta dificil mantener impulso en proyectos propios cuando no hay presion externa que te mueva?", ty:9},
+    {t:"Tienes estandares muy altos para ti mismo que a veces te resultan dificiles de sostener?", ty:1},
+    {t:"Sientes que tu valor como persona esta ligado a cuanto puedes hacer por los demas?", ty:2},
+    {t:"El reconocimiento publico de tus logros te importa significativamente mas que el proceso en si?", ty:3},
+    {t:"Sientes una tension permanente entre querer pertenecer y necesitar ser diferente al mismo tiempo?", ty:4},
+    {t:"Sientes que tus recursos emocionales son limitados y debes administrarlos cuidadosamente?", ty:5},
+    {t:"Sientes incomodidad ante la ambiguedad o cuando no sabes exactamente que esperar de una situacion?", ty:6},
+    {t:"Prefieres mantener tu agenda flexible en lugar de planificar todo con anticipacion detallada?", ty:7},
+    {t:"Tenes una presencia fuerte que otros perciben rapidamente incluso antes de que digas una palabra?", ty:8},
+    {t:"Prefieres encontrar puntos en comun con las personas antes que enfatizar diferencias que separan?", ty:9}
+];
+
+var QperPage  = 6;
+var totalPages = Math.ceil(QUESTIONS.length / QperPage);
+var answers   = {};
+var pageTimes = {};
+var pageStart = null;
+var curPage   = 0;
+var userName  = '';
+var userLast  = '';
+var userEmail = '';
+var radarChart = null;
+
+function recordTime(pg) {
+    if (pageStart !== null) {
+        var s = Math.floor((Date.now() - pageStart) / 1000);
+        pageTimes[pg] = (pageTimes[pg] || 0) + s;
+        pageStart = null;
+    }
+}
+
+function fmtTime(s) {
+    return Math.floor(s / 60) + 'm ' + (s % 60) + 's';
+}
+
+function buildRespuestas() {
+    var parts = [];
+    for (var pg = 0; pg < totalPages; pg++) {
+        var s0 = pg * QperPage;
+        var s1 = Math.min(s0 + QperPage, QUESTIONS.length);
+        var lbl = PAGE_LABELS[pg] || ('P' + (pg + 1));
+        var qp  = [];
+        for (var i = s0; i < s1; i++) {
+            qp.push((i + 1) + ';' + (answers[i] || 0));
+        }
+        parts.push('{' + lbl + ': ' + fmtTime(pageTimes[pg] || 0) + ' - ' + qp.join(', ') + '}');
+    }
+    return parts.join(' ');
+}
+
+function getSession() {
+    var ks = [
+        'usuarioAdmin',
+        'emailAdmin',
+        'userName',
+        'userEmail',
+        'userRole',
+        'packStatus',
+        'isLoggedIn',
+        'fromUserboard',
+        'sessionStartTime',
+        'isThisFirstTime_Log_From_LiveServer'
+    ];
+
+    var o = {};
+    ks.forEach(function(k) {
+        o[k] = sessionStorage.getItem(k) || '';
+    });
+
+o.userName = (o.userName || '').trim();
+o.usuarioAdmin = (o.usuarioAdmin || '').trim();
+o.emailAdmin = (o.emailAdmin || '').trim();
+
+    return o;
+}
+
+function startTest() {
+    userName  = (document.getElementById('userName').value  || '').trim();
+    userLast  = (document.getElementById('userLastName').value || '').trim();
+    userEmail = (document.getElementById('userEmail').value || '').trim();
+    if (!userName || !userLast || !userEmail) {
+        alert('Por favor, completa todos los campos');
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
+        alert('Por favor, ingresa un correo electronico valido');
+        return;
+    }
+    document.getElementById('registrationScreen').classList.add('hidden');
+    document.getElementById('testScreen').classList.remove('hidden');
+    showPage();
+}
+
+function showPage() {
+    pageStart = Date.now();
+    var s0 = curPage * QperPage;
+    var ctr = document.getElementById('questionsContainer');
+    ctr.innerHTML = '';
+
+    for (var i = 0; i < QperPage && (s0 + i) < QUESTIONS.length; i++) {
+        var qi = s0 + i;
+        var q  = QUESTIONS[qi];
+
+        var card = document.createElement('div');
+        card.className = 'question-card';
+
+        var td = document.createElement('div');
+        td.className = 'question-text';
+        td.textContent = q.t;
+        card.appendChild(td);
+
+        var sd = document.createElement('div');
+        sd.className = 'scale-options';
+
+        for (var v = 1; v <= 5; v++) {
+            var op = document.createElement('div');
+            op.className = 'scale-option';
+            var rb = document.createElement('input');
+            rb.type  = 'radio';
+            rb.id    = 'q' + qi + 'v' + v;
+            rb.name  = 'q' + qi;
+            rb.value = v;
+            if (answers[qi] === v) rb.checked = true;
+            rb.addEventListener('change', (function(qii, vv) {
+                return function() { answers[qii] = vv; checkDone(); };
+            })(qi, v));
+            var lb = document.createElement('label');
+            lb.htmlFor     = 'q' + qi + 'v' + v;
+            lb.textContent = v;
+            op.appendChild(rb);
+            op.appendChild(lb);
+            sd.appendChild(op);
+        }
+        card.appendChild(sd);
+        ctr.appendChild(card);
+    }
+    updateUI();
+}
+
+function checkDone() {
+    var s0 = curPage * QperPage;
+    var ok = true;
+    for (var i = s0; i < s0 + QperPage && i < QUESTIONS.length; i++) {
+        if (answers[i] === undefined) { ok = false; break; }
+    }
+    document.getElementById('nextBtn').disabled = !ok;
+}
+
+function updateUI() {
+    document.getElementById('pageInfo').textContent = 'Pagina ' + (curPage + 1) + ' de ' + totalPages;
+    var done = Object.keys(answers).length;
+    var pct  = Math.round(done / QUESTIONS.length * 100);
+    document.getElementById('progressFill').style.width  = pct + '%';
+    document.getElementById('progressPercent').textContent = pct + '%';
+    document.getElementById('prevBtn').style.display = curPage > 0 ? 'block' : 'none';
+    document.getElementById('nextBtn').textContent   = curPage === totalPages - 1 ? 'Enviar datos' : 'Siguiente';
+    checkDone();
+}
+
+function nextPage() {
+    recordTime(curPage);
+    if (curPage < totalPages - 1) {
+        curPage++;
+        showPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+        calcResults();
+    }
+}
+
+function prevPage() {
+    recordTime(curPage);
+    if (curPage > 0) {
+        curPage--;
+        showPage();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function calcResults() {
+    var scores = [0,0,0,0,0,0,0,0,0,0];
+    QUESTIONS.forEach(function(q, i) {
+        if (answers[i]) scores[q.ty] += answers[i];
+    });
+    var maxS = 0, dom = 1;
+    for (var t = 1; t <= 9; t++) {
+        if (scores[t] > maxS) { maxS = scores[t]; dom = t; }
+    }
+    showResults(dom, scores);
+}
+
+function showResults(dom, scores) {
+    var sess  = getSession();
+    var now   = new Date();
+    var fecha = now.toLocaleDateString('es-AR') + ', ' + now.toLocaleTimeString('es-AR');
+
+    var total = 0;
+    for (var i = 1; i <= 9; i++) total += scores[i];
+
+    var pct = [0,0,0,0,0,0,0,0,0,0];
+    for (var t = 1; t <= 9; t++) {
+        pct[t] = total > 0 ? Math.round((scores[t] / total) * 100) : 0;
+    }
+
+    var loginUser = (sess.userName || '').trim();
+
+
+    // Construir scores como objeto {1:N, 2:N, ...}
+    var scoresObj = {};
+    for (var ts = 1; ts <= 9; ts++) scoresObj[ts] = scores[ts] || 0;
+
+    var payload = {
+        Nombre:        userName,
+        Apellido:      userLast,
+        Correo:        userEmail,
+        Fecha:         fecha,
+        Usuario_Admin: sess.usuarioAdmin || '',
+        Email_Admin:   sess.emailAdmin   || '',
+        User:          loginUser,
+        Username:      loginUser,
+        Respuestas:    buildRespuestas(),
+        Eneatipo:      dom,
+        EneatipoNombre: TYPE_NAMES[dom],
+        Informe:       TYPE_NAMES[dom],
+        scores:        scoresObj,
+        percentages:   pct
+    };
+
+    console.log('SESSION TEST:', sess);
+    console.log('PAYLOAD FINAL:', payload);
+
+    sessionStorage.setItem('eneagramaUserData', JSON.stringify(payload));
+    sessionStorage.setItem('EneagramaUserData', JSON.stringify(payload));
+
+    doSend(dom, scores, pct);
+}
+
+function doSend(dom, scores, pct) {
+    var sess = getSession();
+    var now  = new Date();
+    var fecha = now.toLocaleString('es-AR', {
+        day:'2-digit', month:'2-digit', year:'numeric',
+        hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+    });
+
+    var loginUser = (sess.userName || '').trim();
+    var adminUser = (sess.usuarioAdmin || '').trim();
+    var resp = buildRespuestas();
+
+    var fila = [
+        fecha,
+        adminUser,
+        sess.emailAdmin,
+        loginUser,
+        userName,
+        userLast,
+        userEmail,
+        resp
+    ];
+
+    var fd1 = new URLSearchParams();
+    fd1.append('data', JSON.stringify({ nombreHoja: 'Respuestas', fila: fila }));
+
+    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: fd1 })
+        .then(function(r) { return r.text(); })
+        .then(function(t) {
+            var res1;
+            try { res1 = JSON.parse(t); } catch(e) { throw new Error(t); }
+            if (!res1 || res1.success === false) throw new Error(res1.error || 'Error paso 1');
+
+            var rowNum = res1.row;
+            var eid    = res1.eneagrama_id || res1.Eneagrama_id || '';
+
+            sessionStorage.setItem('eneagrama_row', rowNum);
+            sessionStorage.setItem('eneagrama_id',  eid);
+            sessionStorage.setItem('eneagrama_autoPDF', '1');
+
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = '../Informe/index.html';
+            document.body.appendChild(iframe);
+
+            setTimeout(function() {
+                try { document.body.removeChild(iframe); } catch(e) {}
+            }, 60000);
+
+            console.log('[Test] Fila guardada → row=' + rowNum + ' id=' + eid);
+        })
+        .catch(function(e) {
+            console.error('Error guardando fila:', e);
+        });
+
+    // Mostrar resultados inmediatamente
+    document.getElementById('testScreen').classList.add('hidden');
+    document.getElementById('registrationScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.remove('hidden');
+}
+
+
+
+function drawRadar(pct) {
+    if (radarChart) radarChart.destroy();
+    var ctx = document.getElementById('radarChart').getContext('2d');
+    radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['T1 Reformador','T2 Ayudador','T3 Triunfador',
+                     'T4 Individualista','T5 Investigador','T6 Leal',
+                     'T7 Entusiasta','T8 Desafiante','T9 Pacificador'],
+            datasets: [{
+                data: [pct[1],pct[2],pct[3],pct[4],pct[5],pct[6],pct[7],pct[8],pct[9]],
+                backgroundColor: 'rgba(2,15,39,0.2)',
+                borderColor: '#020f27', borderWidth: 3,
+                pointBackgroundColor: '#020f27', pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff', pointHoverBorderColor: '#020f27',
+                pointRadius: 5, pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: true,
+            scales: { r: {
+                beginAtZero: true,
+                ticks: { font: { size: 11 }, callback: function(v){ return v+'%'; } },
+                pointLabels: { font: { size: 11, weight: 'bold' }, color: '#020f27' },
+                grid: { color: '#e5e7eb' }, angleLines: { color: '#e5e7eb' }
+            }},
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function drawBars(pct) {
+    var ctr = document.getElementById('distributionBars');
+    ctr.innerHTML = '';
+    for (var i = 1; i <= 9; i++) {
+        var item = document.createElement('div'); item.className = 'bar-item';
+        var hdr  = document.createElement('div'); hdr.className  = 'bar-header';
+        var lbl  = document.createElement('span'); lbl.className = 'bar-label'; lbl.textContent = TYPE_NAMES[i];
+        var pc   = document.createElement('span'); pc.className  = 'bar-percent'; pc.textContent = pct[i] + '%';
+        hdr.appendChild(lbl); hdr.appendChild(pc);
+        var bg   = document.createElement('div'); bg.className   = 'bar-background';
+        var fill = document.createElement('div'); fill.className = 'bar-fill'; fill.id = 'bar' + i;
+        bg.appendChild(fill); item.appendChild(hdr); item.appendChild(bg); ctr.appendChild(item);
+    }
+    // Find dominant type for visual highlight
+    var domI = 1;
+    for (var di = 2; di <= 9; di++) { if (pct[di] > pct[domI]) domI = di; }
+    setTimeout(function() {
+        for (var i = 1; i <= 9; i++) {
+            var fill = document.getElementById('bar' + i);
+            // Scale bar width relative to max value for better visibility
+            var maxPct = pct[domI] || 1;
+            fill.style.width = Math.round((pct[i] / maxPct) * 100) + '%';
+            if (i === domI) {
+                fill.style.background = 'linear-gradient(135deg, #1e3a5f 0%, #0b4a6e 100%)';
+                fill.style.height = '14px';
+            }
+        }
+    }, 100);
+}
+
+function restartTest() {
+    curPage = 0; answers = {}; pageTimes = {}; pageStart = null;
+    userName = ''; userLast = ''; userEmail = '';
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+    document.getElementById('userName').value    = '';
+    document.getElementById('userLastName').value = '';
+    document.getElementById('userEmail').value   = '';
+    document.getElementById('successMsg').classList.add('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
+    document.getElementById('registrationScreen').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function init() {
+    document.getElementById('startBtn').addEventListener('click',     startTest);
+    document.getElementById('prevBtn').addEventListener('click',      prevPage);
+    document.getElementById('nextBtn').addEventListener('click',      nextPage);
+    document.getElementById('restartBtn').addEventListener('click',   restartTest);
+    document.getElementById('backPanelBtn').addEventListener('click', function() {
+        window.location.href = '../Userboard/Index.html';
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+window.startTest   = startTest;
+window.prevPage    = prevPage;
+window.nextPage    = nextPage;
+window.restartTest = restartTest;
+
+})();
+</script>
+</body>
+</html>

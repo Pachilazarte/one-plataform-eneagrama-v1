@@ -1,0 +1,329 @@
+/* =========================================================
+   ONE Eneagrama — Userboard CSS DEFINITIVO
+   Inspirado en el informe ONE: paleta violeta/dorado/magenta
+   Ring con overflow:visible, sin webkit-clip en el %
+   ========================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+.hidden { display: none !important; }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(110,62,171,0.35); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(226,184,8,0.4); }
+
+/* ── Animaciones ──────────────────────────────────────────── */
+@keyframes sesionPulse {
+    0%,100% { box-shadow: 0 0 6px #50fa7b; }
+    50%      { box-shadow: 0 0 12px #50fa7b; }
+}
+@keyframes eyebrowPulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:0.45; transform:scale(0.7); }
+}
+@keyframes fadeIn {
+    from { opacity:0; transform:translateY(14px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── Eyebrow dot ──────────────────────────────────────────── */
+.eyebrow-dot {
+    display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #e2b808;
+    box-shadow: 0 0 8px rgba(226,184,8,0.8);
+    flex-shrink: 0;
+    animation: eyebrowPulse 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   HERO GRID — layout dos columnas que no se rompe
+   ══════════════════════════════════════════════════════════ */
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+    }
+    .hero-right { order: -1; }
+}
+
+.hero-left  { min-width: 0; }
+.hero-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Botones hero ─────────────────────────────────────────── */
+#btnStartTest, #btnViewReport {
+    transition: all 0.25s ease;
+    font-family: 'Poppins', sans-serif;
+}
+#btnStartTest:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(110,62,171,0.35);
+    border-color: rgba(110,62,171,0.65) !important;
+}
+#btnStartTest:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+#btnViewReport:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(149,58,144,0.3);
+    border-color: rgba(149,58,144,0.6) !important;
+}
+
+/* ── Stat cards ───────────────────────────────────────────── */
+.stat-card {
+    position: relative; overflow: hidden;
+    border: 1px solid rgba(110,62,171,0.25);
+    background: rgba(255,255,255,0.04);
+    transition: all 0.25s ease; cursor: default;
+}
+.stat-card::before {
+    content: ''; position: absolute;
+    top:0; left:0; right:0; height:1.5px;
+    background: linear-gradient(90deg, rgba(110,62,171,0.6), transparent);
+}
+.stat-card:hover {
+    background: rgba(110,62,171,0.1) !important;
+    border-color: rgba(226,184,8,0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESS RING
+   - .ring-wrap: contenedor 288x288 FIJO
+   - .ring-svg:  overflow visible para que el glow no se corte
+   ══════════════════════════════════════════════════════════ */
+.ring-wrap {
+    position: relative;
+    width: 288px;
+    height: 288px;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.ring-svg {
+    /* Tamaño exacto — no usa width:100% que lo hace crecer */
+    width: 288px;
+    height: 288px;
+    display: block;
+    /* ✅ overflow visible: el glow del borde no se corta */
+    overflow: visible;
+}
+
+/* Fill — transición suave */
+.ring-fill {
+    transition: stroke-dashoffset 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: drop-shadow(0 0 4px rgba(110,62,171,0.4));
+}
+
+/* Glow animado al completar — sin clip */
+@keyframes ringDone {
+    0%,100% {
+        filter: drop-shadow(0 0 5px rgba(110,62,171,0.5));
+    }
+    40% {
+        filter: drop-shadow(0 0 14px rgba(34,211,238,0.75))
+                drop-shadow(0 0 28px rgba(34,211,238,0.3));
+    }
+    80% {
+        filter: drop-shadow(0 0 14px rgba(226,184,8,0.8))
+                drop-shadow(0 0 28px rgba(226,184,8,0.35));
+    }
+}
+.ring-fill-done {
+    animation: ringDone 3s ease-in-out infinite;
+}
+
+/* Fondo interior oscuro del ring */
+.ring-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 210px; height: 210px;
+    border-radius: 50%;
+    background: rgba(10,1,24,0.75);
+    border: 1px solid rgba(110,62,171,0.15);
+    box-shadow: 0 0 40px rgba(110,62,171,0.2);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+}
+
+/* Texto central del ring */
+.ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+    z-index: 2;
+    width: 180px;
+}
+
+/* % — color y textShadow vía JS, nunca background-clip */
+.ring-pct {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-family: 'Poppins', sans-serif;
+    font-variant-numeric: tabular-nums;
+    /* transición suave al cambiar color */
+    transition: color 0.5s ease, text-shadow 0.6s ease;
+}
+
+.ring-sub {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.03em;
+    font-family: 'Exo 2', sans-serif;
+}
+
+.ring-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #e2b808;
+    line-height: 1.5;
+    margin-top: 6px;
+    font-family: 'Exo 2', sans-serif;
+}
+
+/* ── Status section ───────────────────────────────────────── */
+#testStatusContainer button {
+    transition: all 0.25s ease !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+#testStatusContainer button:not(:disabled):hover {
+    transform: translateY(-2px) !important;
+}
+
+/* ── Manual section ───────────────────────────────────────── */
+#manualSection:not(.hidden) {
+    animation: fadeIn 0.4s ease forwards;
+}
+
+.manual-action-card {
+    position: relative; overflow: hidden;
+    padding: 22px; border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(110,62,171,0.25);
+    backdrop-filter: blur(12px);
+    transition: border-color 0.3s ease;
+}
+.manual-action-card::before {
+    content: ''; position: absolute;
+    top:0; left:0; right:0; height:1.5px;
+    background: linear-gradient(90deg, rgba(226,184,8,0.5), rgba(110,62,171,0.35), transparent);
+}
+.manual-action-card:hover { border-color: rgba(226,184,8,0.25); }
+
+.manual-action-badge {
+    display: inline-flex; align-items: center;
+    padding: 5px 12px; border-radius: 999px;
+    background: rgba(80,250,123,0.08);
+    border: 1px solid rgba(80,250,123,0.2);
+    color: #86efac; font-size: 0.67rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+.manual-download-btn {
+    width: 100%; min-height: 52px;
+    padding: 13px 16px; border: 0;
+    border-radius: 13px; cursor: pointer;
+    color: #060d0f; font-size: 0.92rem; font-weight: 800;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #6be1e3 0%, #e17bd7 55%, #e2b808 100%);
+    box-shadow: 0 8px 28px rgba(107,225,227,0.2);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.manual-download-btn:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(107,225,227,0.3); }
+.manual-download-btn:active { transform:scale(0.98); }
+.manual-download-btn:disabled { opacity:0.4; box-shadow:none; transform:none; cursor:not-allowed; }
+
+.manual-status-text        { min-height:20px; color:#9ca3af; font-size:0.83rem; line-height:1.5; }
+.manual-status-text.is-ready   { color:#86efac; }
+.manual-status-text.is-loading { color:#6be1e3; }
+.manual-status-text.is-error   { color:#fda4af; }
+.manual-section-disabled { opacity:0.45; pointer-events:none; }
+
+/* ══════════════════════════════════════════════════════════
+   MODELO ENEAGRAMA — estilo informe ONE
+   ══════════════════════════════════════════════════════════ */
+
+/* Section label — idéntico al informe */
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.section-label-text {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6e3eab;
+    white-space: nowrap;
+    font-family: 'Poppins', sans-serif;
+}
+.section-label-line {
+    height: 1.5px;
+    flex: 1;
+    background: linear-gradient(90deg, rgba(110,62,171,0.6), transparent);
+}
+
+/* Eyebrow de tipo */
+.enea-eyebrow {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(226,184,8,0.5);
+    margin-bottom: 0.3rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Cards del modelo — estilo card del informe */
+.enea-card {
+    position: relative; overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(110,62,171,0.22);
+    backdrop-filter: blur(8px);
+    transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.enea-card::before {
+    content: ''; position: absolute;
+    top:0; left:0; right:0; height:1.5px;
+    background: linear-gradient(90deg, rgba(110,62,171,0.5), transparent);
+    opacity: 0; transition: opacity 0.3s ease;
+}
+.enea-card:hover { border-color: rgba(226,184,8,0.25); }
+.enea-card:hover::before { opacity: 1; }
+
+.enea-num { transition: filter 0.25s ease, transform 0.25s ease; }
+.enea-card:hover .enea-num {
+    filter: brightness(1.25);
+    transform: scale(1.06);
+}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer { border-top: 1px solid rgba(110,62,171,0.18) !important; }
+
+/* ── Entrada del hero (sin opacity:0 que rompe la visibilidad) ── */
+@keyframes heroSlide {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.hero-left  { animation: heroSlide 0.6s ease 0.1s both; }
+.hero-right { animation: heroSlide 0.6s ease 0.25s both; }

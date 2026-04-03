@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluación Eneagrama — ONE Platform</title>
+    <link rel="icon" type="image/png" href="./img/favicon.png" sizes="32x32">
+    <link rel="shortcut icon" href="./img/favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="./img/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'exo': ['"Exo 2"', 'sans-serif'],
+                        'dm':  ['"DM Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="font-dm min-h-screen overflow-x-hidden">
+
+    <!-- ═══ FONDO ═══ -->
+    <canvas id="starsCanvas" class="stars-canvas"></canvas>
+    <div class="bg-base"></div>
+    <div class="hex-overlay"></div>
+
+    <!-- ═══ HEADER FIJO ═══ -->
+    <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-10 py-4 header-bar">
+        <div class="flex items-center gap-3">
+            <img src="./img/one-logocolor.png" alt="ONE" class="h-9 w-auto logo-img">
+            <div class="h-5 w-px bg-white opacity-10"></div>
+            <span class="font-exo text-xs font-700 tracking-widest uppercase text-white opacity-50">Eneagrama</span>
+        </div>
+        <div id="headerProgress" class="hidden items-center gap-3">
+            <div class="progress-track">
+                <div class="progress-fill" id="headerProgressFill"></div>
+            </div>
+            <span class="font-exo text-xs font-600 text-white opacity-60" id="headerProgressPct">0%</span>
+        </div>
+    </header>
+
+    <!-- ═══ PANTALLA: REGISTRO ═══ -->
+    <div id="registrationScreen" class="screen-wrap">
+        <div class="screen-inner max-w-lg mx-auto">
+
+            <!-- Eyebrow -->
+            <div class="flex items-center justify-center mb-8 fade-up" style="animation-delay:.05s">
+                <span class="eyebrow-tag">
+                    <span class="eyebrow-dot"></span>
+                    Evaluación profunda de personalidad
+                </span>
+            </div>
+
+            <!-- Título -->
+            <div class="text-center mb-4 fade-up" style="animation-delay:.12s">
+                <h1 class="font-exo font-800 text-white leading-tight" style="font-size:clamp(2rem,5vw,3rem);">
+                    Test de Eneagrama<br>
+                    <span class="text-grad">Profesional</span>
+                </h1>
+            </div>
+            <p class="text-center text-sm leading-relaxed mb-10 fade-up" style="color:rgba(255,255,255,0.52);animation-delay:.18s;">
+                Descubrí tu tipo de personalidad y potenciá tu desarrollo profesional
+            </p>
+
+            <!-- Escala -->
+            <div class="scale-box mb-10 fade-up" style="animation-delay:.24s" aria-label="Referencia de escala">
+                <p class="scale-title">Escala de respuesta</p>
+                <div class="scale-grid">
+                    <div class="scale-item"><strong>1</strong><span>Nunca</span></div>
+                    <div class="scale-item"><strong>2</strong><span>Rara vez</span></div>
+                    <div class="scale-item"><strong>3</strong><span>A veces</span></div>
+                    <div class="scale-item"><strong>4</strong><span>Frecuente</span></div>
+                    <div class="scale-item"><strong>5</strong><span>Siempre</span></div>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="space-y-5 fade-up" style="animation-delay:.30s">
+                <div class="field-group">
+                    <label class="field-label" for="userName">Nombre</label>
+                    <input type="text" id="userName" class="field-input" placeholder="Ingresá tu nombre">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="userLastName">Apellido</label>
+                    <input type="text" id="userLastName" class="field-input" placeholder="Ingresá tu apellido">
+                </div>
+                <div class="field-group">
+                    <label class="field-label" for="userEmail">Correo electrónico</label>
+                    <input type="email" id="userEmail" class="field-input" placeholder="tucorreo@ejemplo.com">
+                </div>
+                <button class="btn-primary w-full mt-2" id="startBtn">
+                    Comenzar Test
+                    <svg class="w-4 h-4 ml-2 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══ PANTALLA: TEST ═══ -->
+    <div id="testScreen" class="hidden screen-wrap">
+        <div class="screen-inner max-w-2xl mx-auto">
+
+            <!-- Info de página -->
+            <div class="flex items-center justify-between mb-3 fade-up">
+                <span class="font-exo text-xs font-600 tracking-widest uppercase" style="color:rgba(255,255,255,0.38);" id="pageInfo">Página 1 de 9</span>
+                <span class="font-exo text-xs font-700" style="color:rgba(200,170,255,0.75);" id="progressPercent">0%</span>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="progress-track-full mb-8 fade-up" style="animation-delay:.05s">
+                <div class="progress-fill-full" id="progressFill"></div>
+            </div>
+
+            <!-- Preguntas -->
+            <div id="questionsContainer" class="space-y-3 mb-8"></div>
+
+            <!-- Navegación -->
+            <div class="flex gap-3 justify-end fade-up">
+                <button class="btn-ghost" id="prevBtn" style="display:none">← Anterior</button>
+                <button class="btn-primary" id="nextBtn" disabled>Siguiente →</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══ PANTALLA: RESULTADO ═══ -->
+    <div id="resultScreen" class="result-screen hidden screen-wrap">
+        <div class="screen-inner max-w-md mx-auto text-center">
+
+            <div class="confirm-icon-wrap fade-up">
+                <div class="confirm-icon">
+                    <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="font-exo font-800 text-white text-3xl mt-6 mb-2 fade-up" style="animation-delay:.08s;">Evaluación completada</h1>
+            <p class="text-sm mb-8 fade-up" style="color:rgba(255,255,255,0.50);animation-delay:.14s;">Tus respuestas fueron enviadas correctamente.</p>
+
+            <div class="result-info-card fade-up" style="animation-delay:.20s;">
+                <p style="color:rgba(255,255,255,0.72);">
+                    Podrás ver tu informe completo ya. 
+                    desde la sección <strong class="text-violet-300">Mi Panel → Informe → Descargar PDF</strong>.
+                </p>
+<p class="mt-3 text-xs" style="color:rgba(255,255,255,0.45); line-height: 1.4;">
+    El análisis detallado de tu perfil eneagramático estará disponible en tu perfil en unos instantes. 
+    <br><br>
+    <strong>¡Buenas noticias!</strong> También hemos enviado una copia completa a tu correo electrónico; la recibirás en un lapso máximo de 30 minutos. Revisa tu bandeja de entrada (y la de spam, por si las dudas) para comenzar tu viaje de autodescubrimiento.
+</p>
+
+            <div id="successMsg" class="success-badge hidden mt-4 fade-up">¡Respuestas guardadas correctamente!</div>
+
+            <div class="flex gap-3 justify-center mt-8 fade-up" style="animation-delay:.26s;">
+                <button class="btn-primary" id="backPanelBtn">Ir al Panel →</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Export oculto -->
+    <div id="ruedaExport" style="position:fixed;left:-10000px;top:-10000px;width:800px;height:800px;overflow:hidden;"></div>
+
+    <script src="./script.js"></script>
+</body>
+</html>

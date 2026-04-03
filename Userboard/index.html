@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Panel — ONE Eneagrama</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="../img/favicon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'enea-gold':    '#e2b808',
+                        'enea-violet':  '#6e3eab',
+                        'enea-fuchsia': '#953a90',
+                        'enea-cyan':    '#22d3ee',
+                        'enea-green':   '#50fa7b',
+                        'enea-indigo':  '#47278c',
+                    },
+                    fontFamily: {
+                        'exo':    ['"Exo 2"',  'sans-serif'],
+                        'pop':    ['Poppins',  'sans-serif'],
+                    },
+                    boxShadow: {
+                        'enea-gold':    '0 0 30px rgba(226,184,8,0.3)',
+                        'enea-violet':  '0 0 30px rgba(110,62,171,0.28)',
+                        'enea-fuchsia': '0 0 30px rgba(149,58,144,0.25)',
+                        'enea-cyan':    '0 0 30px rgba(34,211,238,0.22)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="./style.css" />
+    <script src="../Marca.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/helpers.js"></script>
+</head>
+<body class="font-pop text-white min-h-screen overflow-x-hidden" style="background:#0a0118;">
+
+    <!-- Fondo animado — mismo que el informe ONE -->
+    <div class="fixed inset-0 -z-10 pointer-events-none" style="
+        background:
+            radial-gradient(ellipse 80% 60% at 20% 10%, rgba(71,39,140,0.35) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 50% at 80% 80%, rgba(149,58,144,0.2)  0%, transparent 60%),
+            radial-gradient(ellipse 50% 40% at 60% 30%, rgba(226,184,8,0.07)  0%, transparent 50%);
+    "></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl border-b" style="background:rgba(10,1,24,0.75);border-color:rgba(110,62,171,0.2);">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex items-center justify-between gap-4">
+
+                <div class="flex items-center gap-3">
+                    <img src="../img/one-logocolor.png" alt="ONE" class="w-9 h-9 object-contain" style="filter:drop-shadow(0 0 10px rgba(110,62,171,0.5));">
+                    <div style="width:1px;height:26px;background:rgba(110,62,171,0.3);"></div>
+                    <div>
+                        <div class="text-sm font-extrabold tracking-widest font-pop" style="letter-spacing:0.12em;">ENEAGRAMA</div>
+                        <div class="text-xs" style="color:#c0c0c0;" id="userInfo">Cargando usuario...</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs" style="background:rgba(110,62,171,0.1);border:1px solid rgba(110,62,171,0.25);color:#c0c0c0;">
+                        <span class="w-1.5 h-1.5 rounded-full bg-enea-green" style="box-shadow:0 0 6px #50fa7b;animation:sesionPulse 2s ease-in-out infinite;"></span>
+                        Sesión activa
+                    </div>
+                    <button onclick="Auth.logout()"
+                        class="px-4 py-2 rounded-full text-sm font-semibold font-pop transition-all hover:-translate-y-0.5"
+                        style="border:1px solid rgba(110,62,171,0.4);background:rgba(110,62,171,0.08);color:#fff;">
+                        Cerrar sesión
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+
+        <!-- ═══════════════════════════════════════════
+             HERO — grid dos columnas
+        ═══════════════════════════════════════════ -->
+        <section class="hero-grid mb-20 lg:mb-28">
+
+            <!-- Columna izquierda -->
+            <div class="hero-left">
+
+                <!-- Eyebrow -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase mb-6"
+                     style="border:1px solid rgba(226,184,8,0.35);background:rgba(226,184,8,0.08);color:#f4ce29;letter-spacing:0.16em;">
+                    <span class="eyebrow-dot"></span>
+                    Evaluación profunda de personalidad
+                </div>
+
+                <h1 class="font-pop font-extrabold leading-tight mb-5" style="font-size:clamp(2.2rem,5vw,3.8rem);">
+                    Bienvenido al<br>
+                    <span style="background:linear-gradient(135deg,#6e3eab,#47278c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Sistema</span>
+                    de Evaluación<br>
+                    <span style="background:linear-gradient(135deg,#953a90,#e2b808);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Eneagrama</span>
+                </h1>
+
+                <p class="text-base mb-7 max-w-lg leading-relaxed" style="color:rgba(255,255,255,0.65);">
+                    Plataforma de autoconocimiento y desarrollo con lectura de eneatipo, interpretación profesional y reporte descargable.
+                </p>
+
+                <!-- Botones -->
+                <div class="flex flex-col gap-3 mb-8 max-w-md">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="btnStartTest"
+                            class="flex-1 px-6 py-3 rounded-full font-bold text-sm font-pop transition-all hover:-translate-y-1 relative overflow-hidden"
+                            style="border:1px solid rgba(110,62,171,0.45);background:rgba(110,62,171,0.12);">
+                            <div class="absolute inset-0 -z-10" style="background:linear-gradient(135deg,rgba(110,62,171,0.15),rgba(71,39,140,0.08));"></div>
+                            Comenzar evaluación
+                        </button>
+<button id="btnViewReport"
+    class="flex-1 px-6 py-3 rounded-full font-bold text-sm font-pop transition-all hover:-translate-y-1"
+    style="border:1px solid rgba(149,58,144,0.4);background:rgba(149,58,144,0.08);"
+    onclick="viewReport()">
+    Ver informe
+</button>
+                    </div>
+                    <a href="../download/Eneagrama_Material_de_Estudio_ONE.pdf"
+                       download
+                       class="flex items-center justify-center gap-3 px-6 py-3.5 rounded-full font-bold text-xs uppercase transition-all hover:-translate-y-1 group"
+                       style="border:1px solid rgba(226,184,8,0.3);background:rgba(226,184,8,0.07);color:#f4ce29;letter-spacing:0.1em;">
+                        <svg class="w-4 h-4 flex-shrink-0 transition-transform group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Descargar Manual de Estudio General
+                    </a>
+                </div>
+
+                <!-- Stats — estilo informe -->
+                <div class="flex flex-wrap gap-3">
+                    <div class="stat-card px-5 py-3 rounded-2xl text-center min-w-[90px]">
+                        <div class="text-xl font-black font-pop" style="color:#f4ce29;">9</div>
+                        <div class="text-[10px] uppercase tracking-widest mt-0.5" style="color:#c0c0c0;">Eneatipos</div>
+                    </div>
+                    <div class="stat-card px-5 py-3 rounded-2xl text-center min-w-[90px]">
+                        <div class="text-xl font-black font-pop" style="color:#f4ce29;">3</div>
+                        <div class="text-[10px] uppercase tracking-widest mt-0.5" style="color:#c0c0c0;">Centros</div>
+                    </div>
+                    <div class="stat-card px-5 py-3 rounded-2xl text-center min-w-[90px]">
+                        <div class="text-xl font-black font-pop" style="color:#f4ce29;">Inst.</div>
+                        <div class="text-[10px] uppercase tracking-widest mt-0.5" style="color:#c0c0c0;">Reporte</div>
+                    </div>
+                </div>
+
+            </div><!-- /hero-left -->
+
+            <!-- Columna derecha — Progress Ring -->
+            <div class="hero-right">
+                <!-- RING: tamaño fijo 288px, overflow visible para que el glow no se corte -->
+                <div class="ring-wrap">
+                    <svg class="ring-svg" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%"   stop-color="#6e3eab"/>
+                                <stop offset="50%"  stop-color="#22d3ee"/>
+                                <stop offset="100%" stop-color="#e2b808"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Track -->
+                        <circle cx="144" cy="144" r="110"
+                            fill="none"
+                            stroke="rgba(110,62,171,0.15)"
+                            stroke-width="18"
+                            transform="rotate(-90,144,144)"/>
+                        <!-- Fill — animado por JS -->
+                        <circle class="ring-fill"
+                            cx="144" cy="144" r="110"
+                            fill="none"
+                            stroke="url(#ringGrad)"
+                            stroke-width="18"
+                            stroke-linecap="round"
+                            transform="rotate(-90,144,144)"
+                            style="stroke-dasharray:691.15;stroke-dashoffset:691.15;"/>
+                    </svg>
+
+                    <!-- Fondo interior oscuro -->
+                    <div class="ring-bg"></div>
+
+                    <!-- Texto central -->
+                    <div class="ring-text">
+                        <span class="ring-pct" id="progressPercent">0%</span>
+                        <span class="ring-sub">Progreso</span>
+                        <span class="ring-label">Mapa de<br>Eneagrama</span>
+                    </div>
+                </div>
+            </div><!-- /hero-right -->
+
+        </section><!-- /hero -->
+
+        <!-- Status -->
+        <section class="mb-16">
+            <div id="alertContainer"></div>
+            <div id="loadingContainer" class="hidden"></div>
+            <div id="testStatusContainer"></div>
+        </section>
+
+        <!-- Manual Pack Líder -->
+        <section id="manualSection" class="hidden mt-10">
+            <div class="relative overflow-hidden rounded-3xl" style="border:1px solid rgba(110,62,171,0.25);background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);">
+                <div class="absolute inset-0 pointer-events-none" style="background:linear-gradient(135deg,rgba(110,62,171,0.1),transparent 50%,rgba(149,58,144,0.07));"></div>
+                <div class="absolute top-0 left-0 right-0 h-px" style="background:linear-gradient(90deg,#e2b808,#6e3eab,transparent);"></div>
+                <div class="relative z-10 p-6 sm:p-8 lg:p-10">
+                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-8">
+                        <div class="flex-1">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase mb-4"
+                                 style="border:1px solid rgba(226,184,8,0.3);background:rgba(226,184,8,0.08);color:#f4ce29;letter-spacing:0.16em;">
+                                Recurso personalizado — Pack Líder Eneagrama
+                            </div>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold font-pop mb-3">Manual de estudio personalizado</h3>
+                            <p class="text-sm leading-7" style="color:rgba(255,255,255,0.65);">
+                                Descargá una guía creada a partir del informe de Eneagrama del alumno.
+                            </p>
+                        </div>
+                        <div class="xl:w-[340px] shrink-0">
+                            <div class="manual-action-card">
+                                <div class="manual-action-badge">Disponible con informe cargado</div>
+                                <button id="btnDownloadManual" type="button"
+                                        class="manual-download-btn mt-5"
+                                        onclick="downloadStudyManual()">
+                                    Descargar manual
+                                </button>
+                                <div id="manualStatusText" class="manual-status-text mt-4">
+                                    Preparado para generar el recurso del alumno.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br/><br/>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             MODELO ENEAGRAMA — estilo informe ONE
+        ═══════════════════════════════════════════ -->
+        <section>
+
+            <div class="text-center mb-10">
+                <h2 class="text-3xl sm:text-4xl font-bold font-pop mb-2">Modelo Eneagrama</h2>
+                <p class="text-sm max-w-lg mx-auto" style="color:#c0c0c0;">
+                    Nueve eneatipos para comprender patrones de motivación, conducta y desarrollo personal.
+                </p>
+            </div>
+
+            <!-- Section label — igual que el informe -->
+            <div class="section-label mb-10">
+                <span class="section-label-text">Patrones Analizados</span>
+                <div class="section-label-line"></div>
+            </div>
+
+            <!-- Centros -->
+            <div class="grid md:grid-cols-3 gap-5 mb-8">
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num w-13 h-13 flex items-center justify-center text-xl font-black rounded-full mb-4" style="background:rgba(110,62,171,0.15);color:#c4a0f8;width:52px;height:52px;">C</div>
+                    <div class="enea-eyebrow">Triada mental</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">Centro cabeza</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.65);">Eneatipos 5, 6 y 7. Pensamiento, anticipación y seguridad.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-xl font-black rounded-full mb-4" style="background:rgba(149,58,144,0.15);color:#e89fe4;width:52px;height:52px;">❤</div>
+                    <div class="enea-eyebrow">Triada emocional</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">Centro corazón</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.65);">Eneatipos 2, 3 y 4. Imagen, vínculo e identidad personal.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-xl font-black rounded-full mb-4" style="background:rgba(226,184,8,0.12);color:#f4ce29;width:52px;height:52px;">⚡</div>
+                    <div class="enea-eyebrow">Triada instintiva</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">Centro cuerpo</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.65);">Eneatipos 8, 9 y 1. Acción, control y autonomía.</p>
+                </div>
+            </div>
+
+
+            <div class="section-label mb-10">
+                <span class="section-label-text">Sistema de 9 Arquetipos</span>
+                <div class="section-label-line"></div>
+            </div>
+
+            <!-- 9 Tipos -->
+            <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2" style="--hover-glow:rgba(226,184,8,0.2);">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(226,184,8,0.12);color:#f4ce29;width:56px;height:56px;">1</div>
+                    <div class="enea-eyebrow">Reformador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El perfeccionista</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a lo correcto, la mejora, la rectitud y la excelencia.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(149,58,144,0.15);color:#e89fe4;width:56px;height:56px;">2</div>
+                    <div class="enea-eyebrow">Ayudador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El servicial</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado al vínculo, el servicio y la necesidad de ser valorado.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(110,62,171,0.15);color:#c4a0f8;width:56px;height:56px;">3</div>
+                    <div class="enea-eyebrow">Triunfador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El ejecutor</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado al logro, la imagen, la eficacia y el reconocimiento.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(71,39,140,0.2);color:#a78bfa;width:56px;height:56px;">4</div>
+                    <div class="enea-eyebrow">Individualista</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El sensitivo</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a identidad, profundidad emocional y singularidad.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(52,47,29,0.5);color:#d4a850;width:56px;height:56px;">5</div>
+                    <div class="enea-eyebrow">Investigador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El pensador</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado al conocimiento, la observación y el análisis.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(59,130,246,0.12);color:#93c5fd;width:56px;height:56px;">6</div>
+                    <div class="enea-eyebrow">Leal</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El comprometido</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a seguridad, lealtad, previsión y pertenencia.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(226,184,8,0.1);color:#f4ce29;width:56px;height:56px;">7</div>
+                    <div class="enea-eyebrow">Entusiasta</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El optimista</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a posibilidades, disfrute y variedad.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(149,58,144,0.15);color:#e89fe4;width:56px;height:56px;">8</div>
+                    <div class="enea-eyebrow">Desafiador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El líder</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a fuerza, protección, control e intensidad.</p>
+                </div>
+                <div class="enea-card p-6 rounded-2xl hover:-translate-y-2">
+                    <div class="enea-num flex items-center justify-center text-2xl font-black rounded-full mb-3" style="background:rgba(110,62,171,0.12);color:#c4a0f8;width:56px;height:56px;">9</div>
+                    <div class="enea-eyebrow">Pacificador</div>
+                    <h3 class="text-base font-bold font-pop mb-1.5">El mediador</h3>
+                    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.6);">Orientado a armonía, estabilidad y conciliación.</p>
+                </div>
+            </div>
+
+        </section>
+
+<footer class="mt-20 pt-6" style="border-top:1px solid rgba(110,62,171,0.2);">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-6"> <img src="../img/one-logocolor.png" alt="ONE" class="h-6 object-contain" style="opacity:0.8;">
+            
+            <img src="../img/escencial-logoblanco.png" alt="Escencial" class="h-10 object-contain" style="opacity:0.9;">
+        </div>
+        <p class="text-xs" style="color:rgba(255,255,255,0.25);">
+            © 2026 ONE ENEAGRAMA · Plataforma profesional de evaluación · Escencial
+        </p>
+    </div>
+</footer>
+
+    </main>
+
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="../Manual/EneagramaTheme.js"></script>
+    <script src="../Informe/calculoEneagramaTotal.js"></script>
+    <script src="../Manual/EneagramaManual.js"></script>
+    <script src="./script.js"></script>
+
+    <script>
+    // ════════════════════════════════════════════════════
+    // OVERLAY — idéntico al AdminDashboard
+    // ════════════════════════════════════════════════════
+    function showPageOverlay(msg) {
+        let el = document.getElementById('oneLoadingOverlay');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'oneLoadingOverlay';
+            el.innerHTML = `
+                <div class="ov-inner">
+                    <div class="ov-wrap">
+                        <div class="ov-glow"></div>
+                        <div class="ov-arc-a"></div>
+                        <div class="ov-arc-b"></div>
+                        <div class="ov-arc-base"></div>
+                        <img src="../img/one-iconocolor.png" alt="ONE" class="ov-logo"
+                             onerror="this.src='../img/one-icononegro.png'">
+                    </div>
+                    <p class="ov-msg" id="overlayMsg">Cargando...</p>
+                    <p class="ov-sub" id="overlaySub"></p>
+                </div>`;
+            document.body.appendChild(el);
+            const s = document.createElement('style');
+            s.textContent = `
+                #oneLoadingOverlay{position:fixed;inset:0;z-index:9999;background:rgba(10,1,24,0.9);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease;pointer-events:none;}
+                #oneLoadingOverlay.visible{opacity:1;pointer-events:auto;}
+                .ov-inner{display:flex;flex-direction:column;align-items:center;gap:16px;}
+                .ov-wrap{position:relative;width:88px;height:88px;}
+                .ov-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(225,123,215,0.18) 0%,transparent 70%);animation:ovGlow 2.2s ease-in-out infinite;}
+                .ov-arc-a{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid transparent;border-top-color:#e17bd7;border-right-color:rgba(225,123,215,0.45);animation:ovSpin .85s linear infinite;}
+                .ov-arc-b{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid transparent;border-bottom-color:rgba(110,62,171,0.35);animation:ovSpin 2s linear infinite reverse;}
+                .ov-arc-base{position:absolute;inset:-4px;border-radius:50%;border:2.5px solid rgba(225,123,215,0.07);}
+                .ov-logo{width:88px;height:88px;border-radius:50%;object-fit:cover;position:relative;z-index:2;display:block;filter:drop-shadow(0 0 10px rgba(225,123,215,0.3));}
+                .ov-msg{margin:0;font-size:.9rem;font-weight:600;color:rgba(255,255,255,.85);font-family:'Exo 2',sans-serif;letter-spacing:.03em;text-align:center;}
+                .ov-sub{margin:0;font-size:.72rem;color:rgba(225,123,215,.65);font-family:'Exo 2',sans-serif;min-height:15px;text-align:center;}
+                @keyframes ovSpin{to{transform:rotate(360deg);}}
+                @keyframes ovGlow{0%,100%{opacity:.5;transform:scale(1);}50%{opacity:1;transform:scale(1.12);}}
+            `;
+            document.head.appendChild(s);
+        }
+        document.getElementById('overlayMsg').textContent = msg || 'Cargando...';
+        document.getElementById('overlaySub').textContent = '';
+        el.getBoundingClientRect();
+        requestAnimationFrame(() => el.classList.add('visible'));
+    }
+    function hidePageOverlay() {
+        const el = document.getElementById('oneLoadingOverlay');
+        if (!el) return;
+        el.classList.remove('visible');
+        setTimeout(() => el?.parentNode?.removeChild(el), 300);
+    }
+
+    // ════════════════════════════════════════════════════
+    // PROGRESS RING
+    // stroke-dashoffset correcto: circumference = 2π × 110 = 691.15
+    // Sin webkit-background-clip — sin recuadro
+    // ════════════════════════════════════════════════════
+    function setProgress(value) {
+        const fill  = document.querySelector('.ring-fill');
+        const label = document.getElementById('progressPercent');
+        if (!fill || !label) return;
+
+        const C = 2 * Math.PI * 110; // 691.15
+        fill.style.strokeDasharray  = C;
+        fill.style.strokeDashoffset = C - (value / 100) * C;
+        label.textContent = Math.round(value) + '%';
+
+        // Color sólido + text-shadow — NUNCA background-clip (causa el recuadro)
+        if (value >= 100) {
+            fill.classList.add('ring-fill-done');
+            label.style.color      = '#e2b808';
+            label.style.textShadow = '0 0 20px rgba(226,184,8,0.9), 0 0 40px rgba(226,184,8,0.45)';
+        } else {
+            fill.classList.remove('ring-fill-done');
+            label.style.color      = '#ffffff';
+            label.style.textShadow = 'none';
+        }
+    }
+
+    // ════════════════════════════════════════════════════
+    // CACHÉ localStorage — carga instantánea 2da visita
+    // ════════════════════════════════════════════════════
+    function _cacheKey() {
+        return 'one_ub_' + (sessionStorage.getItem('userName') || 'x');
+    }
+function saveUserCache(data, ttlMinutos) {
+    try {
+        var ttl = (ttlMinutos || 3) * 60 * 1000;
+        localStorage.setItem(getUserCacheKey(), JSON.stringify({ ts: Date.now(), ttl: ttl, data: data }));
+    } catch(e) {}
+}
+function loadUserCache() {
+    try {
+        var raw = localStorage.getItem(getUserCacheKey());
+        if (!raw) return null;
+        var p = JSON.parse(raw);
+        var ttl = p.ttl || (3 * 60 * 1000);
+        if (Date.now() - p.ts > ttl) return null;
+        return p.data;
+    } catch(e) { return null; }
+}
+
+    // ════════════════════════════════════════════════════
+    // INIT
+    // ════════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', function () {
+        setProgress(0);
+
+        // Interceptar showLoading para cerrar overlay
+        const _orig = Helpers.showLoading.bind(Helpers);
+        Helpers.showLoading = function(show) {
+            _orig(show);
+            if (!show) hidePageOverlay();
+        };
+
+        const cached = loadUserCache();
+        if (cached && cached.tieneResultado !== undefined) {
+            if (cached.tieneResultado) setProgress(100);
+            showPageOverlay('Actualizando estado...');
+        } else {
+            showPageOverlay('Verificando tu perfil...');
+        }
+    });
+
+    // Exponer al scope global para script.js
+    window.saveUserStatusCache = saveUserCache;
+    window.getUserStatusCache  = loadUserCache;
+    </script>
+
+</body>
+</html>
