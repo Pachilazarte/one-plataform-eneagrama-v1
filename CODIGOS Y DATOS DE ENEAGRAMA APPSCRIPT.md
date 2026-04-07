@@ -443,7 +443,7 @@ function findRowByUsuario(sheet, usuario) {
 function createCORSResponse(content) {
   return ContentService.createTextOutput(content).setMimeType(ContentService.MimeType.JSON);
 }
-Link: https://script.google.com/macros/s/AKfycbx-eYwRloCbVTD501qno90jAGMyAfz-yE5jX0QAAFKWYTO9FHspwqjpmoYlDvlpWK28dA/exec
+Link: https://script.google.com/macros/s/AKfycbxbhSzlqIjqwp1DAJpf28mPfID50GWnfoKgIoI1zBc2XhEg-Jmr0Cde-YdMcawrapeiaQ/exec
 --------------------------------------
 
 Respuestas Test: Platform - Eneagrama
