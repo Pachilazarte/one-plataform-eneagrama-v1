@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer">
      <link rel="icon" type="image/png" href="../img/favicon.png" sizes="32x32">
   <title>Informe de Eneagrama — ONE Platform</title>
 
@@ -661,10 +662,16 @@
           <div class="brand-sub">Informe de Personalidad</div>
         </div>
       </div>
-      <div class="header-meta">
-        <div class="user-fullname" id="user-name-2">—</div>
-        <div class="user-info" id="user-email">—</div>
-        <div class="user-info" id="user-date">—</div>
+<div class="header-meta" style="display:flex;align-items:center;gap:1rem;">
+        <div id="empresa-logo-informe" style="display:none;flex-shrink:0;">
+          <img id="empresa-logo-img-informe" src="" alt="Empresa"
+            style="max-height:48px;max-width:96px;width:auto;height:auto;object-fit:contain;border-radius:8px;opacity:0.9;">
+        </div>
+        <div style="text-align:right;">
+          <div class="user-fullname" id="user-name-2">—</div>
+          <div class="user-info" id="user-email">—</div>
+          <div class="user-info" id="user-date">—</div>
+        </div>
       </div>
     </header>
 
@@ -939,6 +946,24 @@
   <script type="module" src="pdfGenerator/main.js"></script>
 
   <script>
+
+
+(function() {
+    var logo = sessionStorage.getItem('logoEmpresa') || '';
+    if (logo && logo.length > 10) {
+      if (logo.includes('imgur.com/') && !logo.includes('i.imgur.com')) {
+        logo = logo.replace('imgur.com/', 'i.imgur.com/');
+      }
+      if (!logo.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+        logo += '.png';
+      }
+      var wrap = document.getElementById('empresa-logo-informe');
+      var img  = document.getElementById('empresa-logo-img-informe');
+      if (wrap && img) { img.src = logo; wrap.style.display = 'block'; }
+    }
+  })();
+
+  
     // Llenar barra de alas después que script.js corra
     document.addEventListener('DOMContentLoaded', function () {
       setTimeout(function () {

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer">
     <title>Mi Panel — ONE Eneagrama</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,12 +58,16 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
             <div class="flex items-center justify-between gap-4">
 
-                <div class="flex items-center gap-3">
+<div class="flex items-center gap-3">
                     <img src="../img/one-logocolor.png" alt="ONE" class="w-9 h-9 object-contain" style="filter:drop-shadow(0 0 10px rgba(110,62,171,0.5));">
                     <div style="width:1px;height:26px;background:rgba(110,62,171,0.3);"></div>
                     <div>
                         <div class="text-sm font-extrabold tracking-widest font-pop" style="letter-spacing:0.12em;">ENEAGRAMA</div>
                         <div class="text-xs" style="color:#c0c0c0;" id="userInfo">Cargando usuario...</div>
+                    </div>
+                    <div id="empresa-logo-ub" style="display:none;margin-left:0.5rem;">
+                        <img id="empresa-logo-img-ub" src="" alt="Empresa"
+                            style="max-height:36px;max-width:72px;width:auto;height:auto;object-fit:contain;border-radius:6px;opacity:0.85;">
                     </div>
                 </div>
 
@@ -369,6 +374,26 @@
     <script src="./script.js"></script>
 
     <script>
+
+
+
+(function() {
+    var logo = sessionStorage.getItem('logoEmpresa') || '';
+    if (logo && logo.length > 10) {
+      if (logo.includes('imgur.com/') && !logo.includes('i.imgur.com')) {
+        logo = logo.replace('imgur.com/', 'i.imgur.com/');
+      }
+      if (!logo.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+        logo += '.png';
+      }
+
+      var wrap = document.getElementById('empresa-logo-ub');
+      var img  = document.getElementById('empresa-logo-img-ub');
+      if (wrap && img) { img.src = logo; wrap.style.display = 'block'; }
+    }
+  })();
+
+
     // ════════════════════════════════════════════════════
     // OVERLAY — idéntico al AdminDashboard
     // ════════════════════════════════════════════════════

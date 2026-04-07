@@ -13,7 +13,10 @@
   'use strict';
 
   // ── Config ──────────────────────────────────────────────────────────────
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTG4ijRmyn_RdN88lGAudFiXF0_8A78GukRfvCCncO5S7G5wLe938iqveW4EMG1ZAS/exec';
+  var APPS_SCRIPT_URL = (function() {
+    var api = sessionStorage.getItem('apiRespuestas');
+    return (api && api.length > 10) ? api : 'https://script.google.com/macros/s/AKfycbyTG4ijRmyn_RdN88lGAudFiXF0_8A78GukRfvCCncO5S7G5wLe938iqveW4EMG1ZAS/exec';
+})();
   var NOMBRE_HOJA = 'Respuestas';
 
   // ── Sample data (preview local sin sessionStorage) ───────────────────────
@@ -58,7 +61,9 @@ function _loadInformeCache() {
 
 // Prioridad: sessionStorage → caché localStorage → sample
 var stored = sessionStorage.getItem('eneagramaUserData')
-          || sessionStorage.getItem('EneagramaUserData');
+          || sessionStorage.getItem('EneagramaUserData')
+          || localStorage.getItem('eneagramaUserData')   // ← agregá esto
+          || localStorage.getItem('EneagramaUserData');  // ← y esto
 
 if (stored) {
     _userData = JSON.parse(stored);
@@ -206,7 +211,8 @@ if (stored) {
     // 18. Conectar botón PDF
     _conectarBotonPDF();
 
-})();
+});
+
 
   // ════════════════════════════════════════════════════════════════════════
   // PASO 1 — Guardar fila en Google Sheets

@@ -42,9 +42,10 @@ async function checkTestStatus() {
             return;
         }
 
-        const response = await fetch(
-            `${CONFIG.api.informes}?user=${encodeURIComponent(userName)}`
-        );
+const apiVisualizacion = sessionStorage.getItem('apiVisualizacion') || CONFIG.api.informes;
+const response = await fetch(
+    `${apiVisualizacion}?user=${encodeURIComponent(userName)}`
+);
 
         if (!response.ok) {
             throw new Error("Error HTTP " + response.status);

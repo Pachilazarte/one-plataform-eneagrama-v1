@@ -110,8 +110,10 @@
         /* ══════════════════════════════════════════════════════════
         CONFIG — NO TOCAR
         ══════════════════════════════════════════════════════════ */
-        var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTG4ijRmyn_RdN88lGAudFiXF0_8A78GukRfvCCncO5S7G5wLe938iqveW4EMG1ZAS/exec';
-        var PAGE_LABELS = ['PI','PII','PIII','PIV','PV','PVI','PVII','PVIII','PIX','PX','PXI','PXII'];
+var GOOGLE_SCRIPT_URL = (function() {
+    var api = sessionStorage.getItem('apiRespuestas');
+    return (api && api.length > 10) ? api : 'https://script.google.com/macros/s/AKfycbyTG4ijRmyn_RdN88lGAudFiXF0_8A78GukRfvCCncO5S7G5wLe938iqveW4EMG1ZAS/exec';
+})();
 
         var TYPE_NAMES = [null,
             'Tipo 1: El Reformador','Tipo 2: El Ayudador','Tipo 3: El Triunfador',
@@ -123,104 +125,125 @@
         PREGUNTAS — corregidas (ortografía + D. Milano)
         ty: NUNCA MODIFICADO
         ══════════════════════════════════════════════════════════ */
-        var QUESTIONS = [
-            {t:"¿Con qué frecuencia sentís la necesidad de corregir errores o mejorar las cosas a tu alrededor, incluso cuando nadie te lo ha pedido?", ty:1},
-            {t:"Tiendes a anticipar las necesidades de los demás antes de que te las expresen, sintiendo satisfacción al ayudarlos?", ty:2},
-            {t:"¿Cuán importante es para ti proyectar una imagen de éxito y logro en tu entorno profesional y social?", ty:3},
-            {t:"Sentís que hay algo único y diferente en vos que te distingue de las demás personas?", ty:4},
-            {t:"Preferís observar y analizar las situaciones antes de participar activamente en ellas?", ty:5},
-            {t:"Te encontrás frecuentemente anticipando posibles problemas o escenarios negativos antes de tomar decisiones?", ty:6},
-            {t:"Solés tener múltiples planes e ideas emocionantes, sintiendo inquietud cuando la rutina se vuelve monótona?", ty:7},
-            {t:"Te resulta natural tomar el control de las situaciones y defender tus puntos de vista con firmeza?", ty:8},
-            {t:"Preferís mantener la armonía y evitar conflictos, incluso si eso significa postergar tus propias necesidades?", ty:9},
-            {t:"Te resulta difícil relajarte cuando sabés que hay tareas pendientes o cosas que podrían hacerse mejor?", ty:1},
-            {t:"Sentís incomodidad o frustración cuando tus esfuerzos por ayudar a otros no son reconocidos o valorados?", ty:2},
-            {t:"Adaptás tu comportamiento o presentación según el contexto para causar una mejor impresión?", ty:3},
-            {t:"Experimentás emociones intensas que parecen más profundas que las de quienes te rodean?", ty:4},
-            {t:"Necesitás tiempo a solas para recargar energías después de interacciones sociales prolongadas?", ty:5},
-            {t:"Buscás constantemente respaldo o confirmación antes de comprometerte con decisiones importantes?", ty:6},
-            {t:"Te cuesta permanecer enfocado en una sola actividad cuando surgen nuevas oportunidades interesantes?", ty:7},
-            {t:"Valorás la honestidad directa y te incomoda cuando las personas son evasivas o indecisas?", ty:8},
-            {t:"Te cuesta expresar tus opiniones cuando difieren de las del grupo o podrían generar tensión?", ty:9},
-            {t:"Tenés un crítico interno que constantemente evalúa si estás haciendo las cosas de manera correcta?", ty:1},
-            {t:"Te sentís más valorado cuando estás siendo útil o indispensable para alguien?", ty:2},
-            {t:"Medís tu autoestima en función de tus logros y el reconocimiento que recibís?", ty:3},
-            {t:"Sentís nostalgia por experiencias o conexiones que parecen más auténticas o significativas que tu realidad actual?", ty:4},
-            {t:"Preferís acumular conocimiento y recursos antes de actuar, para sentirte preparado?", ty:5},
-            {t:"Cuestionás las intenciones de los demás hasta que demuestran ser confiables?", ty:6},
-            {t:"Evitás conscientemente situaciones o emociones que puedan resultar dolorosas o limitantes?", ty:7},
-            {t:"Sentís la necesidad de proteger a quienes percibís como vulnerables o en desventaja?", ty:8},
-            {t:"Postergás la toma de decisiones importantes o te distraés con tareas menos relevantes?", ty:9},
-            {t:"Sentís resentimiento cuando otros no cumplen con los mismos estándares de responsabilidad que vos mantenés?", ty:1},
-            {t:"Te resulta más fácil identificar las necesidades ajenas que reconocer las tuyas propias?", ty:2},
-            {t:"Te sentís incómodo con el fracaso al punto de evitar situaciones donde podrías no destacar?", ty:3},
-            {t:"Sentís que algo esencial falta en tu vida, incluso cuando las cosas van objetivamente bien?", ty:4},
-            {t:"Te resulta agotador cuando otros demandan demasiado de tu tiempo o energía emocional?", ty:5},
-            {t:"Sentís tensión entre confiar en figuras de autoridad y cuestionarlas al mismo tiempo?", ty:6},
-            {t:"Mantenés múltiples opciones abiertas porque comprometerte con una sola te genera ansiedad?", ty:7},
-            {t:"Te resulta difícil mostrar vulnerabilidad, prefiriendo proyectar fortaleza en todo momento?", ty:8},
-            {t:"Adoptás las opiniones o preferencias de otros para mantener la paz, aunque no coincidan con las tuyas?", ty:9},
-            {t:"Experimentás frustración cuando las reglas o procedimientos no se siguen adecuadamente?", ty:1},
-            {t:"Sentís que das más en las relaciones de lo que recibís, pero te cuesta expresarlo directamente?", ty:2},
-            {t:"Te enfocás intensamente en tus metas, a veces descuidando tu bienestar emocional o relaciones personales?", ty:3},
-            {t:"Tendés a idealizar lo que no tenés mientras desvalorizás lo que está presente en tu vida?", ty:4},
-            {t:"Necesitás tiempo para prepararte antes de expresar tus ideas en lugar de hacerlo espontáneamente?", ty:5},
-            {t:"Tendés a planificar exhaustivamente para minimizar riesgos e imprevistos?", ty:6},
-            {t:"Reencuadrás las experiencias negativas buscando el lado positivo rápidamente?", ty:7},
-            {t:"Cuando hay un problema, preferís hablarlo de frente antes que dejarlo sin resolver?", ty:8},
-            {t:"Te fusionás con las agendas de otros, perdiendo contacto con tus propias prioridades y deseos?", ty:9},
-            {t:"Sentís que hay una forma correcta de hacer las cosas y te frustrás cuando no se respeta?", ty:1},
-            {t:"Modificás tu comportamiento para ser querido o aceptado por las personas importantes en tu vida?", ty:2},
-            {t:"Te resulta difícil desconectar del trabajo o pausar tu búsqueda de objetivos para simplemente estar?", ty:3},
-            {t:"Sentís atracción por la belleza, el arte o experiencias que expresan profundidad emocional?", ty:4},
-            {t:"Establecés límites claros en tu vida para proteger tu espacio personal y privacidad?", ty:5},
-            {t:"Te cuesta confiar en tu propio juicio, buscando validación externa frecuentemente?", ty:6},
-            {t:"Preferís mantener las conversaciones ligeras y optimistas, evitando temas pesados o dolorosos?", ty:7},
-            {t:"Tenés poca paciencia con la debilidad o la victimización, tanto en vos como en otros?", ty:8},
-            {t:"Encontrás difícil identificar qué es realmente importante para vos entre todas las demandas externas?", ty:9},
-            {t:"Cuando terminás una tarea, solés revisarla varias veces para asegurarte de que no haya errores?", ty:1},
-            {t:"Tendés a intuir cuando alguien necesita ayuda antes de que te lo pidan y actuar de inmediato?", ty:2},
-            {t:"Te comparás frecuentemente con otros en términos de logros o éxito para medir tu progreso?", ty:3},
-            {t:"Sentís que pocas personas realmente comprenden la profundidad de tus experiencias internas?", ty:4},
-            {t:"Preferís entender completamente un tema antes de compartir tu opinión o involucrarte?", ty:5},
-            {t:"Antes de tomar una decisión importante, necesitás consultar con personas de confianza para validarla?", ty:6},
-            {t:"Cuando enfrentás situaciones difíciles, tu primer impulso es buscar algo positivo o una nueva salida?", ty:7},
-            {t:"Cuando alguien es injusto o deshonesto, tendés a confrontarlo directamente sin rodeos?", ty:8},
-            {t:"Cuando hay tensión entre personas cercanas, sentís la necesidad de mediar y restaurar la armonía?", ty:9},
-            {t:"Sentís tensión interna cuando alguien hace algo de manera incorrecta o ineficiente frente a vos?", ty:1},
-            {t:"Te cuesta decir que no cuando alguien te pide un favor, incluso cuando no tenés tiempo o energía?", ty:2},
-            {t:"Tendés a presentar la mejor versión posible de vos mismo en situaciones sociales o profesionales?", ty:3},
-            {t:"A veces te quedás atrapado en emociones difíciles más tiempo del que considerarías razonable?", ty:4},
-            {t:"Tendés a retirarte emocionalmente cuando las situaciones se vuelven muy intensas o demandantes?", ty:5},
-            {t:"Tendés a imaginar lo que podría salir mal en una situación incluso cuando todo parece estar bien?", ty:6},
-            {t:"Te aburris rápidamente de las rutinas y buscás activamente nuevas experiencias o proyectos?", ty:7},
-            {t:"Te incomoda profundamente depender de otros o necesitar apoyo externo para lograr tus objetivos?", ty:8},
-            {t:"A veces te dás cuenta de que perdiste de vista tus propias necesidades por enfocarte en las de otros?", ty:9},
-            {t:"Te resulta difícil disfrutar el tiempo libre cuando sentís que podrías estar siendo más productivo?", ty:1},
-            {t:"Tu bienestar emocional depende en gran parte de que las personas cercanas estén bien?", ty:2},
-            {t:"Te resulta difícil descansar genuinamente cuando sentís que otros avanzan más rápido que vos?", ty:3},
-            {t:"Buscás crear experiencias que reflejen auténticamente quién sos sin importar la opinión ajena?", ty:4},
-            {t:"Valorás tu independencia y autonomía por encima de la conexión social frecuente?", ty:5},
-            {t:"La lealtad y la confianza son valores que definís como absolutamente no negociables para vos?", ty:6},
-            {t:"Te resulta difícil comprometerte con una sola opción cuando hay muchas posibilidades disponibles?", ty:7},
-            {t:"En situaciones de conflicto, tendés a intensificar la confrontación antes que buscar una salida?", ty:8},
-            {t:"Te resulta difícil mantener impulso en proyectos propios cuando no hay presión externa que te mueva?", ty:9},
-            {t:"Tenés estándares muy altos para vos mismo que a veces te resultan difíciles de sostener?", ty:1},
-            {t:"Sentís que tu valor como persona está ligado a cuánto podés hacer por los demás?", ty:2},
-            {t:"El reconocimiento público de tus logros te importa significativamente más que el proceso en sí?", ty:3},
-            {t:"Sentís una tensión permanente entre querer pertenecer y necesitar ser diferente al mismo tiempo?", ty:4},
-            {t:"Sentís que tus recursos emocionales son limitados y debés administrarlos cuidadosamente?", ty:5},
-            {t:"Sentís incomodidad ante la ambigüedad o cuando no sabés exactamente qué esperar de una situación?", ty:6},
-            {t:"Preferís mantener tu agenda flexible en lugar de planificar todo con anticipación detallada?", ty:7},
-            {t:"Tendés a ocupar el espacio con seguridad y decisión cuando entrás a una situación nueva?", ty:8},
-            {t:"Preferís encontrar puntos en común con las personas antes que enfatizar diferencias que separan?", ty:9}
-        ];
+var QperPage   = 10;
+var PAGE_LABELS = ['T1','T2','T3','T4','T5','T6','T7','T8','T9'];
+
+
+var QUESTIONS = [
+    // ── TIPO 1 — El Perfeccionista ──────────────────────────────
+    {t:"Cuando notás un error o algo que podría hacerse mejor, ¿sentís una tensión interna que no se calma hasta que lo corregís o lo señalás?", ty:1},
+    {t:"¿Te resulta difícil relajarte cuando sabés que hay tareas pendientes o cosas que podrían hacerse mejor?", ty:1},
+    {t:"¿Tenés un crítico interno que constantemente evalúa si estás haciendo las cosas de manera correcta?", ty:1},
+    {t:"¿Sentís resentimiento cuando otros no cumplen con los mismos estándares de responsabilidad que vos mantenés?", ty:1},
+    {t:"¿Experimentás frustración cuando las reglas o procedimientos no se siguen adecuadamente?", ty:1},
+    {t:"¿Sentís que hay una forma correcta de hacer las cosas y te frustrás cuando no se respeta?", ty:1},
+    {t:"¿Cuando terminás una tarea, solés revisarla varias veces para asegurarte de que no haya errores?", ty:1},
+    {t:"¿Sentís tensión interna cuando alguien hace algo de manera incorrecta o ineficiente frente a vos?", ty:1},
+    {t:"¿Te resulta difícil disfrutar el tiempo libre cuando sentís que podrías estar siendo más productivo?", ty:1},
+    {t:"¿Tenés estándares muy altos para vos mismo que a veces te resultan difíciles de sostener?", ty:1},
+
+    // ── TIPO 2 — El Ayudador ────────────────────────────────────
+    {t:"¿Tendés a anticipar las necesidades de los demás antes de que te las expresen, sintiendo satisfacción al ayudarlos?", ty:2},
+    {t:"¿Sentís incomodidad o frustración cuando tus esfuerzos por ayudar a otros no son reconocidos o valorados?", ty:2},
+    {t:"¿Te sentís más valorado cuando estás siendo útil o indispensable para alguien?", ty:2},
+    {t:"¿Te resulta más fácil identificar las necesidades ajenas que reconocer las tuyas propias?", ty:2},
+    {t:"¿Sentís que das más en las relaciones de lo que recibís, pero te cuesta expresarlo directamente?", ty:2},
+    {t:"¿Modificás tu comportamiento para ser querido o aceptado por las personas importantes en tu vida?", ty:2},
+    {t:"¿Cuando percibís que alguien cercano está mal, sentís una urgencia interna de ayudar aunque no te hayan pedido que lo hagas?", ty:2},
+    {t:"¿Te cuesta decir que no cuando alguien te pide un favor, incluso cuando no tenés tiempo o energía?", ty:2},
+    {t:"¿Tu bienestar emocional depende en gran parte de que las personas cercanas estén bien?", ty:2},
+    {t:"¿Sentís que tu valor como persona está ligado a cuánto podés hacer por los demás?", ty:2},
+
+    // ── TIPO 3 — El Triunfador ──────────────────────────────────
+    {t:"¿Sentís que tu valor como persona está directamente relacionado con lo que lográs o lo que otros perciben de vos?", ty:3},
+    {t:"¿Adaptás tu comportamiento o presentación según el contexto para causar una mejor impresión?", ty:3},
+    {t:"¿Medís tu autoestima en función de tus logros y el reconocimiento que recibís?", ty:3},
+    {t:"¿Te sentís incómodo con el fracaso al punto de evitar situaciones donde podrías no destacar?", ty:3},
+    {t:"¿Te enfocás intensamente en tus metas, a veces descuidando tu bienestar emocional o relaciones personales?", ty:3},
+    {t:"¿Te resulta difícil desconectar del trabajo o pausar tu búsqueda de objetivos para simplemente estar?", ty:3},
+    {t:"¿Te comparás frecuentemente con otros en términos de logros o éxito para medir tu progreso?", ty:3},
+    {t:"¿Presentás versiones distintas de vos mismo según el contexto, asegurándote de que siempre quede la mejor imagen posible?", ty:3},
+    {t:"¿Te resulta difícil descansar genuinamente cuando sentís que otros avanzan más rápido que vos?", ty:3},
+    {t:"¿A veces sentís que si dejaras de lograr cosas o de ser exitoso, no sabrías muy bien quién sos realmente sin eso?", ty:3},
+
+    // ── TIPO 4 — El Individualista ──────────────────────────────
+    {t:"¿Sentís que hay algo único y diferente en vos que te distingue de las demás personas?", ty:4},
+    {t:"¿Experimentás emociones intensas que parecen más profundas que las de quienes te rodean?", ty:4},
+    {t:"¿Sentís nostalgia por experiencias o conexiones que parecen más auténticas o significativas que tu realidad actual?", ty:4},
+    {t:"¿Sentís que algo esencial falta en tu vida, incluso cuando las cosas van objetivamente bien?", ty:4},
+    {t:"¿Tendés a idealizar lo que no tenés mientras desvalorizás lo que está presente en tu vida?", ty:4},
+    {t:"¿Sentís atracción por la belleza, el arte o experiencias que expresan profundidad emocional?", ty:4},
+    {t:"¿Sentís que pocas personas realmente comprenden la profundidad de tus experiencias internas?", ty:4},
+    {t:"¿A veces te quedás atrapado en emociones difíciles más tiempo del que considerarías razonable?", ty:4},
+    {t:"¿Buscás crear experiencias que reflejen auténticamente quién sos sin importar la opinión ajena?", ty:4},
+    {t:"¿Sentís una tensión permanente entre querer pertenecer y necesitar ser diferente al mismo tiempo?", ty:4},
+
+    // ── TIPO 5 — El Investigador ────────────────────────────────
+    {t:"¿Sentís que las interacciones sociales prolongadas te consumen energía de una manera que requiere tiempo a solas para poder recuperarte?", ty:5},
+    {t:"¿Cuando alguien invade tu espacio, tiempo o privacidad sin avisar, sentís una incomodidad interna intensa que resulta difícil de ignorar?", ty:5},
+    {t:"¿Sentís que actuar sin entender completamente una situación es casi intolerable, incluso cuando el tiempo o las circunstancias te presionan para actuar?", ty:5},
+    {t:"¿Preferís tener pocos compromisos sociales para proteger tu tiempo y energía, y sentís alivio cuando planes se cancelan?", ty:5},
+    {t:"¿Antes de compartir una idea o posición, necesitás haberla procesado completamente en privado, sintiéndote expuesto si te piden opinar sin preparación?", ty:5},
+    {t:"¿Mantenés compartimentos claros entre las distintas áreas de tu vida (trabajo, familia, amigos) para que no se mezclen ni invadan entre sí?", ty:5},
+    {t:"¿Preferís dominar completamente un tema antes de considerarte en condiciones de opinar, actuar o comprometerte con él?", ty:5},
+    {t:"¿En situaciones de alta intensidad emocional, tu tendencia es retirarte internamente, analizar desde la distancia y desconectarte del componente emocional?", ty:5},
+    {t:"¿Sentís que dar demasiado de tu tiempo o energía emocional a otros te deja vaciado, y necesitás soledad para volver a ser vos?", ty:5},
+    {t:"¿Valorás tu autonomía e independencia al punto de preferir arreglarte solo antes que depender de otros o exponerte a sus demandas?", ty:5},
+
+    // ── TIPO 6 — El Leal ────────────────────────────────────────
+    {t:"¿Te encontrás frecuentemente anticipando posibles problemas o escenarios negativos antes de tomar decisiones?", ty:6},
+    {t:"¿Buscás constantemente respaldo o confirmación antes de comprometerte con decisiones importantes?", ty:6},
+    {t:"¿Cuestionás las intenciones de los demás hasta que demuestran ser confiables?", ty:6},
+    {t:"¿Sentís tensión entre confiar en figuras de autoridad y cuestionarlas al mismo tiempo?", ty:6},
+    {t:"¿Planificás con anticipación y detalle para minimizar riesgos e imprevistos, sintiéndote más seguro cuanto más preparado estés?", ty:6},
+    {t:"¿Te cuesta confiar en tu propio juicio, buscando validación externa frecuentemente?", ty:6},
+    {t:"¿Antes de tomar una decisión importante, necesitás consultar con personas de confianza para validarla?", ty:6},
+    {t:"¿Tendés a imaginar lo que podría salir mal en una situación incluso cuando todo parece estar bien?", ty:6},
+    {t:"¿La lealtad y la confianza son valores tan fundamentales para vos que una traición en ese plano te resulta casi imperdonable?", ty:6},
+    {t:"¿Sentís incomodidad ante la ambigüedad o cuando no sabés exactamente qué esperar de una situación?", ty:6},
+
+    // ── TIPO 7 — El Entusiasta ──────────────────────────────────
+    {t:"¿Solés tener múltiples planes e ideas emocionantes, sintiendo inquietud cuando la rutina se vuelve monótona?", ty:7},
+    {t:"¿Te cuesta permanecer enfocado en una sola actividad cuando surgen nuevas oportunidades interesantes?", ty:7},
+    {t:"¿Evitás conscientemente situaciones o emociones que puedan resultar dolorosas o limitantes?", ty:7},
+    {t:"¿Mantenés múltiples opciones abiertas porque comprometerte con una sola te genera ansiedad?", ty:7},
+    {t:"¿Cuando algo va mal o es doloroso, tu mente busca automáticamente el lado positivo o una salida antes de procesar realmente lo que sentís?", ty:7},
+    {t:"¿Preferís mantener las conversaciones ligeras y optimistas, evitando temas pesados o dolorosos?", ty:7},
+    {t:"¿Sentís que el dolor, la tristeza o los límites son estados que hay que superar rápidamente, no explorar ni sostener por mucho tiempo?", ty:7},
+    {t:"¿Te aburris rápidamente de las rutinas y buscás activamente nuevas experiencias o proyectos?", ty:7},
+    {t:"¿Te resulta difícil comprometerte con una sola opción cuando hay muchas posibilidades disponibles?", ty:7},
+    {t:"¿Preferís mantener tu agenda flexible en lugar de planificar todo con anticipación detallada?", ty:7},
+
+    // ── TIPO 8 — El Desafiador ──────────────────────────────────
+    {t:"¿Cuando entrás a una situación nueva o de tensión, tendés a ocupar el espacio con decisión y seguridad de manera casi automática?", ty:8},
+    {t:"¿Valorás la honestidad directa y te incomoda cuando las personas son evasivas o indecisas?", ty:8},
+    {t:"¿Sentís la necesidad de proteger a quienes percibís como vulnerables o en desventaja?", ty:8},
+    {t:"¿Te resulta difícil mostrar vulnerabilidad, prefiriendo proyectar fortaleza en todo momento?", ty:8},
+    {t:"¿Cuando hay un problema, preferís hablarlo de frente antes que dejarlo sin resolver?", ty:8},
+    {t:"¿Tenés poca paciencia con la debilidad o la victimización, tanto en vos como en otros?", ty:8},
+    {t:"¿Cuando alguien es injusto o deshonesto, tendés a confrontarlo directamente sin rodeos?", ty:8},
+    {t:"¿Te incomoda profundamente depender de otros o necesitar apoyo externo para lograr tus objetivos?", ty:8},
+    {t:"¿En situaciones de conflicto, tendés a intensificar la confrontación antes que buscar una salida?", ty:8},
+    {t:"¿Tendés a ocupar el espacio con seguridad y decisión cuando entrás a una situación nueva?", ty:8},
+
+    // ── TIPO 9 — El Pacificador ─────────────────────────────────
+    {t:"¿Preferís mantener la armonía y evitar conflictos, incluso si eso significa postergar tus propias necesidades?", ty:9},
+    {t:"¿Te cuesta expresar tus opiniones cuando difieren de las del grupo o podrían generar tensión?", ty:9},
+    {t:"¿Postergás la toma de decisiones importantes o te distraés con tareas menos relevantes?", ty:9},
+    {t:"¿Adoptás las opiniones o preferencias de otros para mantener la paz, aunque no coincidan con las tuyas?", ty:9},
+    {t:"¿Te fusionás con las agendas de otros, perdiendo contacto con tus propias prioridades y deseos?", ty:9},
+    {t:"¿Encontrás difícil identificar qué es realmente importante para vos entre todas las demandas externas?", ty:9},
+    {t:"¿Cuando hay tensión entre personas cercanas, sentís la necesidad de mediar y restaurar la armonía?", ty:9},
+    {t:"¿A veces te dás cuenta de que perdiste de vista tus propias necesidades por enfocarte en las de otros?", ty:9},
+    {t:"¿Te resulta difícil mantener impulso en proyectos propios cuando no hay presión externa que te mueva?", ty:9},
+    {t:"¿Preferís encontrar puntos en común con las personas antes que enfatizar diferencias que separan?", ty:9}
+];
+
+var totalPages  = Math.ceil(QUESTIONS.length / QperPage); // = 9
 
         /* ══════════════════════════════════════════════════════════
         ESTADO
         ══════════════════════════════════════════════════════════ */
-        var QperPage   = 6;
-        var totalPages = Math.ceil(QUESTIONS.length / QperPage);
         var answers    = {};
         var pageTimes  = {};
         var pageStart  = null;
@@ -445,10 +468,17 @@
             var sess  = getSession();
             var now   = new Date();
             var fecha = now.toLocaleDateString('es-AR')+', '+now.toLocaleTimeString('es-AR');
-            var total = 0;
-            for (var i=1;i<=9;i++) total+=scores[i];
-            var pct=[0,0,0,0,0,0,0,0,0,0];
-            for (var t=1;t<=9;t++) pct[t]=total>0?Math.round((scores[t]/total)*100):0;
+var qPorTipo = [0,0,0,0,0,0,0,0,0,0];
+QUESTIONS.forEach(function(q) { qPorTipo[q.ty]++; });
+var pct = [0,0,0,0,0,0,0,0,0,0];
+for (var t=1;t<=9;t++) {
+    var n   = qPorTipo[t];
+    var min = n * 1;
+    var max = n * 5;
+    pct[t] = (max > min) ? Math.round(((scores[t] - min) / (max - min)) * 100) : 0;
+    if (pct[t] < 0)   pct[t] = 0;
+    if (pct[t] > 100) pct[t] = 100;
+}
             var loginUser=(sess.userName||'').trim();
             var scoresObj={};
             for (var ts=1;ts<=9;ts++) scoresObj[ts]=scores[ts]||0;

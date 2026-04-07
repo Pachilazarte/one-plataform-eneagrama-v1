@@ -40,7 +40,7 @@ const CONFIG = {
     // 🔗 APIs de Google Apps Script
     api: {
         // WebApp para gestión de SuperAdmin para Admins
-        gestion: "https://script.google.com/macros/s/AKfycbyv5RTuSa-NVRVpsLMseHf1raa3DK5bS7MB63Jw9WIIN3Q-w3haCR38imPBz1Cx_XZd/exec",
+        gestion: "https://script.google.com/macros/s/AKfycbx-eYwRloCbVTD501qno90jAGMyAfz-yE5jX0QAAFKWYTO9FHspwqjpmoYlDvlpWK28dA/exec",
         
         // WebApp para gestión de Admins para Usuarios
         gestionAdmin: "https://script.google.com/macros/s/AKfycbyacVBqleU3QDqIcucMvuRuqh8FBIcvEldEkppl74KCRa0IFlFfe6UUSsimhh9W15zJmw/exec",
@@ -82,6 +82,24 @@ const CONFIG = {
         dateFormat: "DD/MM/YYYY"
     }
 };
+
+
+// ── APIs dinámicas por sesión ──────────────────────────
+CONFIG.api.getRespuestas = function() {
+    var api = sessionStorage.getItem('apiRespuestas');
+    return (api && api.length > 10) ? api : CONFIG.api.informes;
+};
+
+CONFIG.api.getVisualizacion = function() {
+    var api = sessionStorage.getItem('apiVisualizacion');
+    return (api && api.length > 10) ? api : CONFIG.api.informes;
+};
+
+CONFIG.api.getUsuarios = function() {
+    var api = sessionStorage.getItem('apiUsuarios');
+    return (api && api.length > 10) ? api : CONFIG.api.gestionAdmin;
+};
+
 
 // Hacer CONFIG disponible globalmente
 window.CONFIG = CONFIG;

@@ -15,6 +15,19 @@ let usersData         = [];
 let filteredData      = [];
 let completedUsersMap = {};
 
+
+
+function getAdminAPI() {
+    const session = Auth.getSession();
+    return (session && session.apiUsuarios) ? session.apiUsuarios : CONFIG.api.gestionAdmin;
+}
+function getInformesAPI() {
+    const session = Auth.getSession();
+    return (session && session.apiVisualizacion) ? session.apiVisualizacion : CONFIG.api.informes;
+}
+
+
+
 // ─── Clave de caché por admin (cada admin tiene su propio caché) ───────────
 function getCacheKey() {
     const session = Auth.getSession();
@@ -243,7 +256,7 @@ async function initWithCache() {
 async function refreshInBackground() {
     try {
         const session  = Auth.getSession();
-        const response = await Helpers.fetchGET(CONFIG.api.gestionAdmin);
+        const response = await Helpers.fetchGET(getAdminAPI());
         if (!Array.isArray(response)) return;
 
         const newData = response
@@ -291,7 +304,7 @@ async function loadUsers(silentOverlay = false) {
 
     try {
         updateOverlay('Obteniendo usuarios...');
-        const response = await Helpers.fetchGET(CONFIG.api.gestionAdmin);
+        const response = await Helpers.fetchGET(getAdminAPI());
 
         if (!Array.isArray(response)) {
             Helpers.showAlert('Error al cargar usuarios', 'error');
@@ -351,7 +364,7 @@ async function checkTestCompletionForAllUsers() {
 
 async function checkSingleUserTest(userName) {
     try {
-        const response = await fetch(CONFIG.api.informes + '?user=' + encodeURIComponent(userName));
+        const response = await fetch(getInformesAPI() + '?user=' + encodeURIComponent(userName));
         if (!response.ok) return;
         const result = await response.json();
         if (result.success && result.data && result.data.Respuestas && String(result.data.Respuestas).trim() !== '') {
@@ -482,11 +495,19 @@ async function handleCreateUser(e) {
 async function doCreateUser(usuario, password, email, nombre, session, form, packValue) {
     Helpers.showLoading(true);
     try {
+        const apiUrl = getAdminAPI();
+        console.log('🔗 API URL:', apiUrl);
+        console.log('📦 Payload:', { fila: [session.userName, session.userEmail, usuario, password, email, nombre, 'activo', packValue] });
+
         const payload  = { fila: [session.userName, session.userEmail, usuario, password, email, nombre, 'activo', packValue] };
         const formData = new URLSearchParams();
         formData.append('data', JSON.stringify(payload));
-        const response = await fetch(CONFIG.api.gestionAdmin, { method: 'POST', body: formData });
-        const result   = await response.json();
+
+        const response = await fetch(apiUrl, { method: 'POST', body: formData });
+        console.log('📡 Response status:', response.status);
+
+        const result = await response.json();
+        console.log('📨 Result:', result);
 
         if (result && result.status === 'success') {
             showToast('Usuario "' + usuario + '" creado exitosamente', 'success');
@@ -494,14 +515,14 @@ async function doCreateUser(usuario, password, email, nombre, session, form, pac
             const chkPack = document.getElementById('chkPackLider');
             if (chkPack) chkPack.checked = false;
             showCredentialsModal(usuario, password, email);
-            clearCache(); // Invalidar caché al crear usuario
+            clearCache();
             setTimeout(() => loadUsers(true), 1500);
         } else {
             const msg = (result && result.message) ? result.message : 'Respuesta inválida del servidor';
             Helpers.showAlert('Error al crear usuario: ' + msg, 'error');
         }
     } catch (error) {
-        console.error('Error al crear usuario:', error);
+        console.error('❌ Error al crear usuario:', error);
         Helpers.showAlert('Error de conexión al crear usuario', 'error');
     } finally {
         Helpers.showLoading(false);
@@ -563,7 +584,7 @@ async function doEditUser(usuario, nuevoEmail, nuevoNombre, nuevaPass) {
         if (nuevaPass) payload.nuevaPass = nuevaPass;
         const formData = new URLSearchParams();
         formData.append('data', JSON.stringify(payload));
-        const response = await fetch(CONFIG.api.gestionAdmin, { method: 'POST', body: formData });
+        const response = await fetch(getAdminAPI(), { method: 'POST', body: formData });
         const result   = await response.json();
         if (result && result.status === 'success') {
             showToast('Usuario "' + usuario + '" actualizado correctamente', 'success');
@@ -602,7 +623,7 @@ async function doToggleUserStatus(usuario, nuevoEstado) {
         const payload = { accion: 'toggleUserStatus', usuario, adminId: Auth.getSession().userName, nuevoEstado, nombreHoja: 'Users' };
         const formData = new URLSearchParams();
         formData.append('data', JSON.stringify(payload));
-        const response = await fetch(CONFIG.api.gestionAdmin, { method: 'POST', body: formData });
+        const response = await fetch(getAdminAPI(), { method: 'POST', body: formData });
         const result   = await response.json();
         if (result && result.status === 'success') {
             showToast('Estado de "' + usuario + '" cambiado a ' + nuevoEstado, 'success');
@@ -640,7 +661,7 @@ async function doResetUserPassword(usuario, nuevaPass) {
         const payload = { accion: 'resetUserPass', usuario, adminId: Auth.getSession().userName, nuevaPass, nombreHoja: 'Users' };
         const formData = new URLSearchParams();
         formData.append('data', JSON.stringify(payload));
-        const response = await fetch(CONFIG.api.gestionAdmin, { method: 'POST', body: formData });
+        const response = await fetch(getAdminAPI(), { method: 'POST', body: formData });
         const result   = await response.json();
         if (result && result.status === 'success') {
             showToast('Contraseña de "' + usuario + '" actualizada', 'success');
@@ -922,7 +943,7 @@ async function toggleUserPack(usuarioUser, isEnabled) {
         const payload = { accion: 'editarUserPack', usuario: usuarioUser, adminId: session.userName, valor: nuevoValor };
         const formData = new URLSearchParams();
         formData.append('data', JSON.stringify(payload));
-        const response = await fetch(CONFIG.api.gestionAdmin, { method: 'POST', body: formData });
+        const response = await fetch(getAdminAPI(), { method: 'POST', body: formData });
         const result   = await response.json();
         if (result && result.status === 'success') {
             showToast('Permisos actualizados correctamente', 'success');

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer">
   <title>Dashboard Organizacional — ONE Eneagrama</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -26,6 +27,8 @@
   <script src="../../Marca.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/helpers.js"></script>
+<script src="../../Informe/calculoEneagramaTotal.js"></script>
+
 </head>
 <body class="font-exo bg-black text-white min-h-screen overflow-x-hidden">
 
@@ -39,13 +42,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
       <div class="flex items-center justify-between gap-3">
 
-        <div class="flex items-center gap-3">
+<div class="flex items-center gap-3">
           <img src="../../img/one-logocolor.png" alt="ONE" class="w-10 h-10 object-contain flex-shrink-0">
           <div class="hidden sm:block">
             <h2 class="font-exo text-sm font-extrabold tracking-widest bg-gradient-to-r from-one-cyan to-one-pink bg-clip-text text-transparent uppercase leading-tight">
               Dashboard Organizacional
             </h2>
             <p class="text-[10px] text-one-slate">Análisis sistémico del equipo · ONE Eneagrama</p>
+          </div>
+          <div id="empresa-logo-panel" style="display:none;margin-left:0.25rem;">
+              <img id="empresa-logo-img-panel" src="" alt="Empresa"
+                  style="max-height:36px;max-width:72px;width:auto;height:auto;object-fit:contain;border-radius:6px;opacity:0.85;">
           </div>
         </div>
 
@@ -380,6 +387,24 @@
 
   <!-- Toast container -->
   <div id="toastContainer" class="fixed top-5 right-5 z-[600] flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+
+(function() {
+    var logo = sessionStorage.getItem('logoEmpresa') || '';
+    if (logo && logo.length > 10) {
+      if (logo.includes('imgur.com/') && !logo.includes('i.imgur.com')) {
+        logo = logo.replace('imgur.com/', 'i.imgur.com/');
+      }
+      if (!logo.match(/\.(png|jpg|jpeg|gif|webp)$/i)) {
+        logo += '.png';
+      }
+      var wrap = document.getElementById('empresa-logo-panel');
+      var img  = document.getElementById('empresa-logo-img-panel');
+      if (wrap && img) { img.src = logo; wrap.style.display = 'block'; }
+    }
+  })();
+</script>
 
   <script src="./script.js"></script>
 </body>

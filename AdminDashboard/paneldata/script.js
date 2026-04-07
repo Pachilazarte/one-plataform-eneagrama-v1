@@ -11,7 +11,7 @@ Auth.protectPage(CONFIG.roles.ADMIN);
 // ═══════════════════════════════════════════════════════════
 function getPanelCacheKey() {
   const s = Auth.getSession();
-  return 'one_paneldata_' + (s ? s.userName : 'x');
+  return 'one_paneldata_' + (s ? s.userEmail : 'x');
 }
 const PANEL_CACHE_TTL = 10 * 60 * 1000;
 
@@ -305,36 +305,9 @@ let currentModalIdx  = 0;
 let currentModalTab  = 'perfil';
 
 // ─── Cálculo ─────────────────────────────────────────────────────────────────
-const QUESTIONS_TY = [
-  1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,
-  1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,
-  1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,
-  1,2,3,4,5,6,7,8,9
-];
 
-function calcularEneagrama(rawString) {
-  const answers = {};
-  const pairs = (rawString||'').match(/\d+;\d+/g)||[];
-  pairs.forEach(p => {
-    const [q,v] = p.split(';').map(Number);
-    if (q>=1&&q<=90&&v>=1&&v<=5) answers[q-1]=v;
-  });
-  const raw = {1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0};
-  for (let i=0;i<QUESTIONS_TY.length;i++) if (answers[i]!==undefined) raw[QUESTIONS_TY[i]]+=answers[i];
-  let totalRaw=0;
-  for (let t=1;t<=9;t++) totalRaw+=raw[t];
-  const scores={};
-  let maxT=1;
-  for (let t=1;t<=9;t++) { scores[t]=totalRaw>0?Math.round((raw[t]/totalRaw)*100):0; if(raw[t]>raw[maxT])maxT=t; }
-  let suma=0; for (let t=1;t<=9;t++) suma+=scores[t];
-  if (suma!==100&&totalRaw>0) scores[maxT]+=(100-suma);
-  let base=1; for (let t=2;t<=9;t++) if(scores[t]>scores[base])base=t;
-  const ala1=base===1?9:base-1, ala2=base===9?1:base+1;
-  const alaDominante=scores[ala1]>=scores[ala2]?ala1:ala2;
-  return { base, scores, rawScores:raw, ala1, ala2, alaDominante,
-    alaScore1:scores[ala1]||0, alaScore2:scores[ala2]||0,
-    integracion:ENEAGRAMA_INTEGRACION[base], desintegracion:ENEAGRAMA_DESINTEGRACION[base] };
-}
+const calcularEneagrama = window.EneagramaCalc.calcularEneagrama;
+
 
 function buildPerson(p, calc) {
   return {
@@ -403,16 +376,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function refreshInBackground() {
   try {
     const session = Auth.getSession();
-    const usersJson = await Helpers.fetchGET(CONFIG.api.gestionAdmin);
-    if (!Array.isArray(usersJson)) return;
-    const userList = usersJson.filter(r =>
-      String(r.Usuario_Admin||'').trim()===String(session.userName||'').trim() && String(r.User||'').trim()!==''
-    );
+    const apiViz = session.apiVisualizacion;
+    if (!apiViz) return;
+const usersJson = await Helpers.fetchGET(CONFIG.api.getUsuarios());
+if (!Array.isArray(usersJson)) return;
+const userList = usersJson.filter(r =>
+  String(r.User||'').trim()!==''
+);
     if (!userList.length) return;
     const results = await Promise.all(userList.map(async u => {
       const un = String(u.User||'').trim(); if(!un) return null;
       try {
-        const r = await fetch(CONFIG.api.informes+'?user='+encodeURIComponent(un));
+        const r = await fetch(apiViz+'?user='+encodeURIComponent(un));
         const j = await r.json();
         if (j.success&&j.data&&String(j.data.Respuestas||'').trim().length>10) return j.data;
         return null;
@@ -429,21 +404,23 @@ async function refreshInBackground() {
 async function loadData() {
   try {
     const session = Auth.getSession();
+    const apiViz = session.apiVisualizacion;
+    if (!apiViz) { hideOverlay(); allPersons=[]; filteredPersons=[]; renderAll(); return; }
     updateOverlay('Obteniendo usuarios...');
-    let usersJson;
-    try { usersJson = await Helpers.fetchGET(CONFIG.api.gestionAdmin); }
-    catch(e){ hideOverlay(); allPersons=[]; filteredPersons=[]; renderAll(); return; }
-    let userList=[];
-    if (Array.isArray(usersJson)) userList = usersJson.filter(r =>
-      String(r.Usuario_Admin||'').trim()===String(session.userName||'').trim()&&String(r.User||'').trim()!==''
-    );
+let usersJson;
+try { usersJson = await Helpers.fetchGET(CONFIG.api.getUsuarios()); }
+catch(e){ hideOverlay(); allPersons=[]; filteredPersons=[]; renderAll(); return; }
+let userList=[];
+if (Array.isArray(usersJson)) userList = usersJson.filter(r =>
+  String(r.User||'').trim()!==''
+);
     if (!userList.length){ hideOverlay(); allPersons=[]; filteredPersons=[]; renderAll(); return; }
     updateOverlay('Verificando evaluaciones ('+userList.length+' usuarios)...');
     const results = await Promise.all(userList.map(async u=>{
       const un=String(u.User||'').trim(); if(!un) return null;
       try {
         const c=new AbortController(); const t=setTimeout(()=>c.abort(),10000);
-        const r=await fetch(CONFIG.api.informes+'?user='+encodeURIComponent(un),{signal:c.signal});
+        const r=await fetch(apiViz+'?user='+encodeURIComponent(un),{signal:c.signal});
         clearTimeout(t); const j=await r.json();
         if(j.success&&j.data&&String(j.data.Respuestas||'').trim().length>10) return j.data;
         return null;
@@ -1063,21 +1040,23 @@ function switchModalTab(tab){
 
 // ── Ver informe completo — en ventana nueva, sin reemplazar el panel ───────────
 function verInformeCompleto(idx){
-  const p=filteredPersons[idx]; if(!p) return;
-  const payload={
-    Nombre:p._nombre||p.nombre.split(' ')[0]||'',
-    Apellido:p._apellido||p.nombre.split(' ').slice(1).join(' ')||'',
-    Correo:p.email, Fecha:p.fecha, User:p.user,
-    Respuestas:p.respuestas,
-    Eneatipo:p.tipo,
-    EneatipoNombre:'Tipo '+p.tipo+': '+TIPO_NOMBRES[p.tipo],
-    Informe:'Tipo '+p.tipo+': '+TIPO_NOMBRES[p.tipo],
-    scores:p.scores, percentages:p.scores
+  const p = filteredPersons[idx]; if(!p) return;
+  
+  const payload = {
+    Nombre:     p._nombre   || '',
+    Apellido:   p._apellido || '',
+    Correo:     p.email     || '',
+    Fecha:      p.fecha     || '',
+    User:       p.user      || '',
+    Respuestas: p.respuestas || ''
   };
-  // Guardar con ambas claves que lee el Informe
-  sessionStorage.setItem('eneagramaUserData',  JSON.stringify(payload));
-  sessionStorage.setItem('EneagramaUserData',  JSON.stringify(payload));
-  // Abrir en ventana nueva — el panel queda intacto
+  
+  // Usar localStorage — se comparte entre pestañas
+  localStorage.removeItem('eneagramaUserData');
+  localStorage.removeItem('EneagramaUserData');
+  localStorage.setItem('eneagramaUserData', JSON.stringify(payload));
+  localStorage.setItem('EneagramaUserData', JSON.stringify(payload));
+  
   window.open('../../Informe/index.html', '_blank', 'noopener');
 }
 
