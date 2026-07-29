@@ -301,6 +301,16 @@
                     </svg>
                     Actualizar
                 </button>
+                <button class="flex-shrink-0 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-xs font-semibold flex items-center gap-1.5 text-gray-400 hover:text-white"
+                        title="Importar usuarios desde un archivo CSV"
+                        onclick="openImportModal()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Importar
+                </button>
             </div>
         </div>
     </div>
@@ -330,6 +340,84 @@
 
 
 
+
+    <!-- Modal de Importación Masiva de Usuarios (CSV) -->
+    <div id="importModal" class="modal-overlay hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="modal-backdrop absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeImportModal()"></div>
+        <div class="modal-content relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-gradient-to-br from-one-ink to-black border border-white/15 backdrop-blur-xl shadow-2xl">
+            <div class="px-6 py-4 border-b border-white/10 bg-gradient-to-r from-one-cyan/10 to-one-pink/10 flex items-center justify-between sticky top-0 z-10 bg-one-ink">
+                <h3 class="font-exo text-lg font-bold">Importar Usuarios desde CSV</h3>
+                <button onclick="closeImportModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Paso 1: subir archivo -->
+                <div id="importStepFile">
+                    <label id="importDropzone" for="importFileInput"
+                           class="flex flex-col items-center justify-center gap-2 w-full py-10 rounded-2xl border-2 border-dashed border-white/15 hover:border-one-cyan/40 bg-black/20 cursor-pointer transition-all text-center">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-one-cyan">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span class="text-sm font-semibold text-gray-200">Hacé click o arrastrá tu archivo .csv acá</span>
+                        <span class="text-xs text-gray-500">Se acepta un archivo CSV por vez</span>
+                    </label>
+                    <input type="file" id="importFileInput" accept=".csv,text/csv" class="hidden">
+
+                    <label class="flex items-center gap-2 mt-4 text-xs text-gray-300 cursor-pointer select-none">
+                        <input type="checkbox" id="importHasHeaders" checked class="rounded border-white/20 bg-black/40">
+                        El archivo tiene una fila de encabezados (nombres de columna) en la primera fila
+                    </label>
+                    <p id="importFileError" class="hidden text-xs text-red-400 mt-2"></p>
+                </div>
+
+                <!-- Paso 2: mapeo de columnas -->
+                <div id="importStepMap" class="hidden">
+                    <p class="text-xs text-gray-400 mb-4">Elegí qué columna del CSV corresponde a cada dato. Podés repetir la misma columna en más de un campo.</p>
+                    <div id="importMapFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2"></div>
+
+                    <div class="flex items-center justify-between mt-4 mb-2">
+                        <h4 class="text-sm font-bold text-gray-200">Vista previa</h4>
+                        <span id="importPreviewCount" class="text-xs text-gray-500"></span>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-white/10">
+                        <table class="w-full text-xs">
+                            <thead class="bg-white/5">
+                                <tr>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Usuario</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Contraseña</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Email</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Nombre</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Pack Líder</th>
+                                    <th class="px-3 py-2 text-left text-gray-400 font-semibold">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importPreviewBody" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                    <p id="importSummaryNote" class="text-xs text-gray-500 mt-3"></p>
+                </div>
+
+                <!-- Paso 3: progreso / resultado -->
+                <div id="importStepProgress" class="hidden text-center py-6">
+                    <p id="importProgressText" class="text-sm text-gray-300 mb-3">Creando usuarios...</p>
+                    <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div id="importProgressBar" class="h-full bg-gradient-to-r from-one-cyan to-one-pink transition-all" style="width:0%"></div>
+                    </div>
+                </div>
+                <div id="importStepResult" class="hidden"></div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-white/10 flex items-center justify-end gap-3 sticky bottom-0 bg-one-ink">
+                <button onclick="closeImportModal()" class="px-5 py-2.5 rounded-full border border-white/15 text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition-all">Cancelar</button>
+                <button id="importSubmitBtn" onclick="submitImport()" disabled
+                        class="hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-one-cyan/20 to-one-pink/20 border border-one-cyan/40 hover:border-one-cyan/60 transition-all font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                    Importar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal de Editar Usuario -->
     <div id="editModal" class="modal-overlay hidden fixed inset-0 z-[100] flex items-center justify-center p-4">

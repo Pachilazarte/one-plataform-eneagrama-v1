@@ -427,6 +427,8 @@ function setupEventListeners() {
             if (lc.classList.contains('hidden')) setCrearLoading(false);
         }).observe(lc, { attributes: true, attributeFilter: ['class'] });
     }
+
+    setupImportModal();
 }
 
 /* =========================================================
@@ -533,6 +535,315 @@ async function doCreateUser(usuario, password, email, nombre, session, form, pac
         if (txtN) txtN.classList.remove('hidden');
         if (txtL) txtL.classList.add('hidden');
     }
+}
+
+/* =========================================================
+   IMPORTAR USUARIOS MASIVAMENTE (CSV)
+   ========================================================= */
+const IMPORT_FIELDS = [
+    { key: 'usuario',  label: 'Usuario',              required: true  },
+    { key: 'password', label: 'Contraseña',           required: true  },
+    { key: 'email',    label: 'Email',                required: true  },
+    { key: 'nombre',   label: 'Nombre Completo',      required: true  },
+    { key: 'pack',     label: 'Pack Líder (opcional)', required: false }
+];
+
+let importHeaders  = [];   // etiquetas de columna mostradas (reales o "Columna N")
+let importDataRows = [];   // filas de datos (sin la fila de encabezado, si aplica)
+let importMapping  = {};   // { usuario: colIndex, password: colIndex, ... }
+
+// Parser CSV manual (soporta comillas, comas dentro de comillas, comillas escapadas "" y CRLF/LF)
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQuotes) {
+            if (c === '"') {
+                if (text[i + 1] === '"') { field += '"'; i++; }
+                else { inQuotes = false; }
+            } else {
+                field += c;
+            }
+            continue;
+        }
+        if (c === '"') { inQuotes = true; }
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\r') { /* ignorado, lo maneja \n */ }
+        else if (c === '\n') { row.push(field); field = ''; rows.push(row); row = []; }
+        else { field += c; }
+    }
+    if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+
+    return rows.filter(r => !(r.length === 1 && r[0].trim() === ''));
+}
+
+function resetImportState() {
+    importHeaders  = [];
+    importDataRows = [];
+    importMapping  = {};
+
+    document.getElementById('importStepFile').classList.remove('hidden');
+    document.getElementById('importStepMap').classList.add('hidden');
+    document.getElementById('importStepProgress').classList.add('hidden');
+    document.getElementById('importStepResult').classList.add('hidden');
+    document.getElementById('importStepResult').innerHTML = '';
+    const submitBtn = document.getElementById('importSubmitBtn');
+    submitBtn.classList.add('hidden');
+    submitBtn.disabled = true;
+    document.getElementById('importFileInput').value = '';
+    document.getElementById('importHasHeaders').checked = true;
+    const err = document.getElementById('importFileError');
+    err.classList.add('hidden'); err.textContent = '';
+}
+
+function openImportModal() {
+    resetImportState();
+    const modal = document.getElementById('importModal');
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+    void modal.offsetHeight;
+    modal.classList.add('modal-visible');
+}
+
+function closeImportModal() {
+    const modal = document.getElementById('importModal');
+    if (!modal) return;
+    modal.classList.remove('modal-visible');
+    setTimeout(() => { modal.classList.add('hidden'); modal.style.display = ''; resetImportState(); }, 300);
+}
+
+function showImportFileError(msg) {
+    const err = document.getElementById('importFileError');
+    err.textContent = msg;
+    err.classList.remove('hidden');
+}
+
+function handleImportFile(file) {
+    if (!file) return;
+    const err = document.getElementById('importFileError');
+    err.classList.add('hidden'); err.textContent = '';
+
+    if (!/\.csv$/i.test(file.name)) {
+        showImportFileError('El archivo debe ser un .csv'); return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        const rows = parseCSV(String(reader.result || ''));
+        if (rows.length === 0) { showImportFileError('El archivo está vacío o no se pudo leer'); return; }
+
+        const hasHeaders = document.getElementById('importHasHeaders').checked;
+        const colCount   = rows[0].length;
+
+        if (hasHeaders) {
+            importHeaders  = rows[0].map((h, i) => (h && h.trim()) ? h.trim() : ('Columna ' + (i + 1)));
+            importDataRows = rows.slice(1);
+        } else {
+            importHeaders  = Array.from({ length: colCount }, (_, i) => 'Columna ' + (i + 1));
+            importDataRows = rows;
+        }
+
+        if (importDataRows.length === 0) { showImportFileError('No hay filas de datos para importar'); return; }
+
+        buildImportMappingUI();
+        document.getElementById('importStepFile').classList.add('hidden');
+        document.getElementById('importStepMap').classList.remove('hidden');
+        const submitBtn = document.getElementById('importSubmitBtn');
+        submitBtn.classList.remove('hidden');
+        submitBtn.disabled = false;
+    };
+    reader.onerror = () => showImportFileError('No se pudo leer el archivo');
+    reader.readAsText(file, 'UTF-8');
+}
+
+function buildImportMappingUI() {
+    const container = document.getElementById('importMapFields');
+    container.innerHTML = '';
+
+    IMPORT_FIELDS.forEach((field, idx) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'form-group';
+
+        const label = document.createElement('label');
+        label.className = 'block text-xs font-semibold mb-1.5 text-gray-300';
+        label.textContent = field.label + (field.required ? '' : '');
+
+        const select = document.createElement('select');
+        select.id = 'importMap_' + field.key;
+        select.className = 'w-full px-3 py-2 rounded-lg bg-black/40 border border-white/10 focus:border-one-cyan/50 focus:outline-none text-sm text-white';
+
+        if (!field.required) {
+            const optNone = document.createElement('option');
+            optNone.value = ''; optNone.textContent = '— No usar —';
+            select.appendChild(optNone);
+        }
+        importHeaders.forEach((h, colIndex) => {
+            const opt = document.createElement('option');
+            opt.value = String(colIndex);
+            opt.textContent = h;
+            select.appendChild(opt);
+        });
+
+        // Default: intenta matchear por nombre de encabezado parecido al campo
+        const guess = importHeaders.findIndex(h => h.toLowerCase().includes(field.key === 'nombre' ? 'nombre' : field.key));
+        if (guess !== -1) select.value = String(guess);
+        else if (field.required) select.selectedIndex = Math.min(idx, importHeaders.length - 1);
+
+        select.addEventListener('change', () => { importMapping[field.key] = select.value; renderImportPreview(); });
+        importMapping[field.key] = select.value;
+
+        wrap.appendChild(label);
+        wrap.appendChild(select);
+        container.appendChild(wrap);
+    });
+
+    renderImportPreview();
+}
+
+function buildImportedUser(row) {
+    const get = key => {
+        const colIndex = importMapping[key];
+        if (colIndex === undefined || colIndex === '') return '';
+        return (row[Number(colIndex)] || '').trim();
+    };
+    return {
+        usuario:  get('usuario'),
+        password: get('password'),
+        email:    get('email'),
+        nombre:   get('nombre'),
+        pack:     get('pack') ? '01' : ''
+    };
+}
+
+function analyzeImportRows() {
+    const seenInFile = new Set();
+    return importDataRows.map(row => {
+        const u = buildImportedUser(row);
+        const usuarioKey = u.usuario.toLowerCase();
+        const existeEnSistema    = !!usuarioKey && usersData.some(existing => existing.usuario.toLowerCase() === usuarioKey);
+        const duplicadoEnArchivo = !!usuarioKey && seenInFile.has(usuarioKey);
+        if (usuarioKey) seenInFile.add(usuarioKey);
+
+        const incompleto = !u.usuario || !u.password || !u.email || !u.nombre;
+        const invalido    = incompleto || existeEnSistema || duplicadoEnArchivo;
+        return { u, incompleto, existeEnSistema, duplicadoEnArchivo, invalido };
+    });
+}
+
+function renderImportPreview() {
+    const body       = document.getElementById('importPreviewBody');
+    const countLabel = document.getElementById('importPreviewCount');
+    const note       = document.getElementById('importSummaryNote');
+    body.innerHTML = '';
+
+    const analyzed  = analyzeImportRows();
+    const validCount = analyzed.filter(a => !a.invalido).length;
+    const skipCount  = analyzed.length - validCount;
+
+    analyzed.slice(0, 8).forEach(({ u, incompleto, existeEnSistema, duplicadoEnArchivo }) => {
+        let estado = '<span class="text-green-400">Se importa</span>';
+        if (incompleto) estado = '<span class="text-red-400">Faltan datos</span>';
+        else if (existeEnSistema) estado = '<span class="text-yellow-400">Ya existe</span>';
+        else if (duplicadoEnArchivo) estado = '<span class="text-yellow-400">Repetido en el archivo</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+            '<td class="px-3 py-2 text-gray-200">' + sanitize(u.usuario || '—') + '</td>' +
+            '<td class="px-3 py-2 text-gray-500 font-mono">' + (u.password ? '••••••' : '—') + '</td>' +
+            '<td class="px-3 py-2 text-gray-200">' + sanitize(u.email || '—') + '</td>' +
+            '<td class="px-3 py-2 text-gray-200">' + sanitize(u.nombre || '—') + '</td>' +
+            '<td class="px-3 py-2 text-gray-400">' + (u.pack ? 'Sí' : 'No') + '</td>' +
+            '<td class="px-3 py-2">' + estado + '</td>';
+        body.appendChild(tr);
+    });
+
+    countLabel.textContent = 'Mostrando ' + Math.min(8, analyzed.length) + ' de ' + importDataRows.length + ' filas';
+    note.textContent = validCount + ' usuarios listos para crear' + (skipCount > 0 ? ' · ' + skipCount + ' se omitirán (datos incompletos, o "Usuario" ya existe / repetido)' : '');
+
+    const submitBtn = document.getElementById('importSubmitBtn');
+    submitBtn.textContent = validCount > 0 ? ('Importar ' + validCount + ' usuario' + (validCount === 1 ? '' : 's')) : 'Nada para importar';
+    submitBtn.disabled = validCount === 0;
+}
+
+async function postFilaUsuario(fila) {
+    const payload  = { fila: fila };
+    const formData = new URLSearchParams();
+    formData.append('data', JSON.stringify(payload));
+    const response = await fetch(getAdminAPI(), { method: 'POST', body: formData });
+    return response.json();
+}
+
+async function submitImport() {
+    const session = Auth.getSession();
+    if (!session || !session.userName || !session.userEmail) {
+        Helpers.showAlert('Error de sesión. Volvé a iniciar sesión.', 'error'); return;
+    }
+
+    const toCreate = analyzeImportRows().filter(a => !a.invalido).map(a => a.u);
+    if (toCreate.length === 0) return;
+
+    document.getElementById('importStepMap').classList.add('hidden');
+    document.getElementById('importStepProgress').classList.remove('hidden');
+    document.getElementById('importSubmitBtn').classList.add('hidden');
+
+    const progressText = document.getElementById('importProgressText');
+    const progressBar   = document.getElementById('importProgressBar');
+    let created = 0, failed = 0;
+    const errores = [];
+
+    for (let i = 0; i < toCreate.length; i++) {
+        const u = toCreate[i];
+        progressText.textContent = 'Creando usuarios... (' + (i + 1) + '/' + toCreate.length + ')';
+        progressBar.style.width = Math.round(((i + 1) / toCreate.length) * 100) + '%';
+        try {
+            const fila   = [session.userName, session.userEmail, u.usuario, u.password, u.email, u.nombre, 'activo', u.pack];
+            const result = await postFilaUsuario(fila);
+            if (result && result.status === 'success') created++;
+            else { failed++; errores.push(u.usuario + ': ' + ((result && result.message) || 'error desconocido')); }
+        } catch (e) {
+            failed++; errores.push(u.usuario + ': error de conexión');
+        }
+    }
+
+    document.getElementById('importStepProgress').classList.add('hidden');
+    const resultBox = document.getElementById('importStepResult');
+    resultBox.classList.remove('hidden');
+    resultBox.innerHTML =
+        '<div class="text-center py-4">' +
+            '<p class="text-lg font-bold text-green-400 mb-1">' + created + ' usuario' + (created === 1 ? '' : 's') + ' creado' + (created === 1 ? '' : 's') + '</p>' +
+            (failed > 0 ? '<p class="text-sm text-red-400 mb-3">' + failed + ' con error</p>' : '') +
+            (errores.length > 0 ? '<ul class="text-xs text-gray-400 text-left max-h-32 overflow-y-auto bg-black/30 rounded-lg p-3">' + errores.map(e => '<li>' + sanitize(e) + '</li>').join('') + '</ul>' : '') +
+        '</div>';
+
+    if (created > 0) {
+        clearCache();
+        setTimeout(() => loadUsers(true), 1000);
+    }
+}
+
+function setupImportModal() {
+    const dropzone  = document.getElementById('importDropzone');
+    const fileInput = document.getElementById('importFileInput');
+    const hasHeaders = document.getElementById('importHasHeaders');
+    if (!dropzone || !fileInput) return;
+
+    fileInput.addEventListener('change', () => handleImportFile(fileInput.files[0]));
+    hasHeaders.addEventListener('change', () => { if (fileInput.files[0]) handleImportFile(fileInput.files[0]); });
+
+    ['dragover', 'dragenter'].forEach(evt => dropzone.addEventListener(evt, e => {
+        e.preventDefault(); dropzone.classList.add('border-one-cyan/60');
+    }));
+    ['dragleave', 'drop'].forEach(evt => dropzone.addEventListener(evt, e => {
+        e.preventDefault(); dropzone.classList.remove('border-one-cyan/60');
+    }));
+    dropzone.addEventListener('drop', e => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) { fileInput.files = e.dataTransfer.files; handleImportFile(file); }
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImportModal(); });
 }
 
 /* =========================================================
