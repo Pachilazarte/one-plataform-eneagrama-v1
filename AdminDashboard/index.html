@@ -355,6 +355,24 @@
             <div class="p-6">
                 <!-- Paso 1: subir archivo -->
                 <div id="importStepFile">
+                    <div class="flex items-start gap-3 mb-4 p-3 rounded-xl border border-one-cyan/20 bg-one-cyan/5">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-one-cyan flex-shrink-0 mt-0.5">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                        <p class="text-xs text-gray-300 leading-relaxed">
+                            Recordá: el archivo a importar tiene que ser una exportación de Excel o Google Sheets guardada/exportada en formato <strong>CSV</strong>.
+                            Los encabezados de columna pueden ser, por ejemplo: <code class="text-one-cyan">Usuario, Contraseña, Email, Nombre Completo</code> (o DNI, Cargo, etc., vos elegís después qué columna usar para cada dato).
+                            Si tenés dudas, descargá el ejemplo:
+                        </p>
+                    </div>
+                    <button type="button" onclick="downloadImportTemplate()"
+                            class="flex items-center gap-1.5 mb-4 px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 transition-all text-xs font-semibold text-gray-300 hover:text-white">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Descargar plantilla de ejemplo (CSV)
+                    </button>
+
                     <label id="importDropzone" for="importFileInput"
                            class="flex flex-col items-center justify-center gap-2 w-full py-10 rounded-2xl border-2 border-dashed border-white/15 hover:border-one-cyan/40 bg-black/20 cursor-pointer transition-all text-center">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-one-cyan">
@@ -376,6 +394,24 @@
                 <div id="importStepMap" class="hidden">
                     <p class="text-xs text-gray-400 mb-4">Elegí qué columna del CSV corresponde a cada dato. Podés repetir la misma columna en más de un campo.</p>
                     <div id="importMapFields" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-2"></div>
+
+                    <div id="importPackLiderToggle" class="mb-6 p-4 rounded-2xl border border-one-gold/20 bg-one-gold/5 flex items-center justify-between group transition-all hover:border-one-gold/40">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-one-gold/10 flex items-center justify-center text-one-gold">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-8.061 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946 8.061 3.42 3.42 0 010 4.438 3.42 3.42 0 00-1.946 8.061 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-8.061 3.42 3.42 0 010-4.438z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <span class="block text-sm font-bold text-white uppercase tracking-wider font-exo">Habilitar Pack Líder</span>
+                                <span class="text-[11px] text-gray-400">Se aplica a todos los usuarios de esta importación.</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="importPackLider" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-one-gold shadow-[0_0_15px_rgba(228,199,106,0.1)]"></div>
+                        </label>
+                    </div>
 
                     <div class="flex items-center justify-between mt-4 mb-2">
                         <h4 class="text-sm font-bold text-gray-200">Vista previa</h4>
@@ -410,10 +446,14 @@
             </div>
 
             <div class="px-6 py-4 border-t border-white/10 flex items-center justify-end gap-3 sticky bottom-0 bg-one-ink">
-                <button onclick="closeImportModal()" class="px-5 py-2.5 rounded-full border border-white/15 text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition-all">Cancelar</button>
+                <button id="importCancelBtn" onclick="closeImportModal()" class="px-5 py-2.5 rounded-full border border-white/15 text-sm font-semibold text-gray-300 hover:text-white hover:bg-white/5 transition-all">Cancelar</button>
                 <button id="importSubmitBtn" onclick="submitImport()" disabled
                         class="hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-one-cyan/20 to-one-pink/20 border border-one-cyan/40 hover:border-one-cyan/60 transition-all font-bold text-sm disabled:opacity-40 disabled:cursor-not-allowed">
                     Importar
+                </button>
+                <button id="importListoBtn" onclick="closeImportModal()"
+                        class="hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-one-cyan/20 to-one-pink/20 border border-one-cyan/40 hover:border-one-cyan/60 transition-all font-bold text-sm">
+                    Listo
                 </button>
             </div>
         </div>

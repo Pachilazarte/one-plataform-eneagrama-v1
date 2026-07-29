@@ -541,16 +541,27 @@ async function doCreateUser(usuario, password, email, nombre, session, form, pac
    IMPORTAR USUARIOS MASIVAMENTE (CSV)
    ========================================================= */
 const IMPORT_FIELDS = [
-    { key: 'usuario',  label: 'Usuario',              required: true  },
-    { key: 'password', label: 'Contraseña',           required: true  },
-    { key: 'email',    label: 'Email',                required: true  },
-    { key: 'nombre',   label: 'Nombre Completo',      required: true  },
-    { key: 'pack',     label: 'Pack Líder (opcional)', required: false }
+    { key: 'usuario',  label: 'Usuario',         required: true },
+    { key: 'password', label: 'Contraseña',      required: true },
+    { key: 'email',    label: 'Email',           required: true },
+    { key: 'nombre',   label: 'Nombre Completo', required: true }
 ];
 
 let importHeaders  = [];   // etiquetas de columna mostradas (reales o "Columna N")
 let importDataRows = [];   // filas de datos (sin la fila de encabezado, si aplica)
 let importMapping  = {};   // { usuario: colIndex, password: colIndex, ... }
+
+function downloadImportTemplate() {
+    const csv = 'Usuario,Contraseña,Email,Nombre Completo\r\n' +
+                'usuario01,Clave1234,usuario01@empresa.com,Juan Pérez\r\n' +
+                'usuario02,Clave5678,usuario02@empresa.com,María Gómez\r\n';
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'plantilla_importacion_usuarios.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+}
 
 // Parser CSV manual (soporta comillas, comas dentro de comillas, comillas escapadas "" y CRLF/LF)
 function parseCSV(text) {
@@ -589,11 +600,21 @@ function resetImportState() {
     document.getElementById('importStepProgress').classList.add('hidden');
     document.getElementById('importStepResult').classList.add('hidden');
     document.getElementById('importStepResult').innerHTML = '';
+
+    const cancelBtn = document.getElementById('importCancelBtn');
+    cancelBtn.classList.remove('hidden');
+
     const submitBtn = document.getElementById('importSubmitBtn');
     submitBtn.classList.add('hidden');
     submitBtn.disabled = true;
+
+    const listoBtn = document.getElementById('importListoBtn');
+    listoBtn.classList.add('hidden');
+
     document.getElementById('importFileInput').value = '';
     document.getElementById('importHasHeaders').checked = true;
+    document.getElementById('importPackLider').checked = false;
+
     const err = document.getElementById('importFileError');
     err.classList.add('hidden'); err.textContent = '';
 }
@@ -699,6 +720,9 @@ function buildImportMappingUI() {
         container.appendChild(wrap);
     });
 
+    const packSwitch = document.getElementById('importPackLider');
+    packSwitch.onchange = renderImportPreview;
+
     renderImportPreview();
 }
 
@@ -708,12 +732,13 @@ function buildImportedUser(row) {
         if (colIndex === undefined || colIndex === '') return '';
         return (row[Number(colIndex)] || '').trim();
     };
+    const packEnabled = document.getElementById('importPackLider').checked;
     return {
         usuario:  get('usuario'),
         password: get('password'),
         email:    get('email'),
         nombre:   get('nombre'),
-        pack:     get('pack') ? '01' : ''
+        pack:     packEnabled ? '01' : ''
     };
 }
 
@@ -816,6 +841,9 @@ async function submitImport() {
             (failed > 0 ? '<p class="text-sm text-red-400 mb-3">' + failed + ' con error</p>' : '') +
             (errores.length > 0 ? '<ul class="text-xs text-gray-400 text-left max-h-32 overflow-y-auto bg-black/30 rounded-lg p-3">' + errores.map(e => '<li>' + sanitize(e) + '</li>').join('') + '</ul>' : '') +
         '</div>';
+
+    document.getElementById('importCancelBtn').classList.add('hidden');
+    document.getElementById('importListoBtn').classList.remove('hidden');
 
     if (created > 0) {
         clearCache();
